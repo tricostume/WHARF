@@ -1,0 +1,173 @@
+Manual
+------
+
+1. Human Motion Primitives
+--------------------------
+
+The dataset provides labelled recorded executions of a number of simple human
+activities, which are defined as Human Motion Primitives (HMP):
+        1. brush_teeth:    a person brushing their teeth with a toothbrush
+                           held in the right hand
+        2. climb_stairs:   a person climbing up a number of staircase steps
+        3. comb_hair:      a person brushing their hair with a brush held
+                           in the right hand
+        4. descend_stairs: a person going down a number of staircase steps
+        5. drink_glass:    a person sitting at a table, who:
+                           1. grasps a glass on the table and lifts it to
+                              mouth level
+                           2. drinks
+                           3. puts the glass back on the table
+			   back on the table
+        6. eat_meat:	   a person sitting at a table holding a fork in the
+                           right hand and a knife in the left hand, who:
+                           1. cuts a piece of food and holds it with the fork
+                           2. lifts it to mouth level
+                           3. eats
+                           4. lowers the fork again
+        7. eat_soup:	   a person sitting at a table holding a spoon in the
+                           right hand, who:
+                           1. lowers the spoon to fill it
+                           2. lifts it to mouth level
+                           3. eats
+                           4. lowers the spoon again
+        8. getup_bed:      a person who is initially lying on a bed and then
+                           gets up to a standing posture
+        9. liedown_bed:    a person who is initially standing beside a bed
+                           and then lies down on it
+        10.pour_water:     a person who:
+                           1. grabs a bottle from a table with the right hand
+                           2. pours some of its content in a glass on table
+                           3. puts the bottle back on the table
+        11.sitdown_chair:  a person who is initially standing in front of a
+                           chair and then sits down on it
+        12.standup_chair:  a person who is initially sitting on a chair and
+                           then stands up
+        13.use_telephone:  a person who is standing and then:
+                           1. grabs the telephone handle
+                           2. lifts it to face level
+                           3. talks
+                           4. puts the telephone back in its holder
+        14.walk:	   a person taking a number of steps
+
+1. Data Set organization
+------------------------
+
+1.1. Files tree
+---------------
+
+DATA FOLDER
+- brush_teeth (12 elements)
+- climb_stairs (112 elements) *extended*
+- comb_hair (31 elements)
+- descend_stairs (51 elements) *extended*
+- drink_glass (115 elements) *extended*
+- eat_meat (5 elements)
+- eat_soup (3 elements)
+- getup_bed (101 elements)
+- liedown_bed (28 elements)
+- pour_water (100 elements)
+- sitdown_chair (109 elements) *extended*
+- standup_chair (112 elements) *extended*
+- use_telephone (13 elements)
+- walk (100 elements)
+- MODELS
+    - climb_stairs_MODEL (20 elements)
+    - climb_stairs_sMODEL (4 elements) *new*
+    - descend_stairs_sMODEL (4 elements) *new*
+    - drink_glass_MODEL (20 elements)
+    - drink_glass_sMODEL (5 elements) *new*
+    - getup_bed_MODEL (20 elements)
+    - pour_water_MODEL (20 elements)
+    - sitdown_chair_MODEL (20 elements)
+    - sitdown_chair_sMODEL (4 elements) *new*
+    - standup_chair_MODEL (20 elements)
+    - standup_chair_sMODEL (4 elements) *new*
+    - walk_MODEL (20 elements)
+- displayModel.m
+- displayTrial.m
+- MANUAL.TXT
+- README.TXT
+
+1.2. Folder types
+-----------------
+
+The dataset is organized in folders of three different types:
+- [HMP] folders are directly accessible from root and contain all
+  the recordings collected for one HMP. The recordings belong to
+  different volunteers, they are not syncronized with each other
+  and they have different length.
+- [HMP]_MODEL folders are located inside the MODELS folder and
+  contain 20 recordings, belonging to 5 volunteers, for one HMP.
+  The recordings have been synchronized and truncated to have
+  equal length.
+- [HMP]_sMODEL folders are located inside the MODELS folder and
+  contain 4 recordings belonging to a single volunteer for one
+  HMP. The recordings have been syncronized and truncated to
+  have equal length.
+
+3. Accelerometer specifications
+-------------------------------
+
+Type:		   tri-axial accelerometer
+Measurement range: [- 1.5g; + 1.5g]
+Sensitivity: 	   6 bits per axis
+Output data rate:  32 Hz
+Location:	   attached to the right wrist of the user with:
+		   - x axis: pointing toward the hand
+		   - y axis: pointing toward the left
+		   - z axis: perpendicular to the plane of the hand
+
+4. Data format
+--------------
+
+4.1. File naming convention
+---------------------------
+
+Each file in the dataset follows the following naming convention:
+Accelerometer-[START_TIME]-[HMP]-[VOLUNTEER]
+where:
+- [START_TIME]: timestamp of the starting moment of the recording
+                in the format [YYYY-MM-DD-HH-MM-SS]
+- [HMP]:        name of the HMP performed in the recorded trial, following
+                the naming convention specified in Section 2 of this manual
+- [VOLUNTEER]:  identification code of the volunteer performing the recorded
+                motion in the format [gN] where:
+                - "g": indicates the gender of the volunteer
+                       (m -> male, f -> female)
+                - "N": indicates the progressive number associated to the
+                       volunteer
+
+For example the file:
+        Accelerometer-2011-03-24-10-24-39-climb_stairs-f1.txt
+refers to an accelerometer recording that was taken on March 24, 2011, starting
+from 10:24.39 a.m.. The recording refers to the HMP "climb_stairs" executed by
+the volunteer with ID "f1".
+
+4.2 Acceleration data coding
+----------------------------
+
+Acceleration data recorded in the dataset are coded according to the
+following mapping:
+        [0; +63] = [-1.5g; +1.5g]
+
+5. Dataset acquisition details
+-------------------------------
+
+5.1 Volunteers
+--------------
+
+The dataset is composed of the recordings of selected Human Motion Primitives
+perfomed by a total of 17 volunteers. Basic information about the volunteers
+are reported in the table below:
+
+| Gender|       Age        |      Weight      |
+| M | F | Min | Max | Avg  | Min | Max | Avg  |
+|-------|------------------|------------------|
+| 11| 6 | 19  | 81  | 57.4 | 56  | 85  | 72.7 |
+
+5.2 Hardware setup
+------------------
+
+The tri-axial accelerometer is embedded in an ad-hoc sensing device
+(40mm x 22mm x 12mm) that is attached at the right wrist of the user.
+Data transmission to the PC is wired, via a USB cable.
