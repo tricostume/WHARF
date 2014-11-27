@@ -1,5 +1,5 @@
-WHARF Data Set - Wearable Human Activity Recognition Folder Data Set
---------------------------------------------------------------------
+WHARF Data Set
+--------------
 
 
 1. What is it?
@@ -16,7 +16,7 @@ comparison between different approaches and ultimately lead to the development o
 accurate and reliable solutions.
 
 WHARF Data Set is composed of over 1000 recordings of 14 HMP (referring to 5 ADL),
-performed by a total of 17 volunteers:
+performed by 17 volunteers:
 - ADL "Toileting"
 	1.  Brush own teeth
 	2.  Comb own hair
@@ -38,21 +38,11 @@ performed by a total of 17 volunteers:
 	14. Walk
 
 A detailed description of the dataset can be found at:
+
 1. Bruno, B., Mastrogiovanni, F., Sgorbissa, A.:
    A Public Domain Dataset for ADL Recognition Using Wrist-placed Accelerometers
    In: IEEE Int Symp on Robot and Human Interactive Communication (RO-MAN),
    2014
-
-A description of the ADL monitoring system that we have designed on the basis of the
-dataset can be found at:
-1. Bruno, B., Mastrogiovanni, F., Sgorbissa, A., Vernazza, T., Zaccaria, R.: 
-   Analysis of human behavior recognition algorithms based on acceleration data 
-   In: IEEE Int Conf on Robotics and Automation (ICRA), 
-   pp. 1602--1607 (2013)
-2. Bruno, B., Mastrogiovanni, F., Sgorbissa, A., Vernazza, T., Zaccaria, R.: 
-   Human motion modelling and recognition: A computational approach 
-   In: IEEE Int Conf on Automation Science and Engineering (CASE), 
-   pp. 156--161 (2012)
 
 
 2. Version
@@ -63,7 +53,9 @@ Released on: 27/11/2014
 2.1. Version history
 --------------------
 27/11/2014:    version 1.2 is published, with clearer data organization
+
 23/06/2014:    version 1.1 is published, with 5 new models and a total of 74 new trials (1)
+
 11/02/2014:    version 1.0 of the dataset is published at UCI Machine Learning Repository
 
 (1) The trials and models added in this version were collected by Fabio Fimmanò and Laura
@@ -105,18 +97,18 @@ For further license information, please contact the authors.
 If you want to be informed about dataset updates and new code releases, obtain further
 information about the provided dataset, or contribute to its development please write to:
 
-- Barbara Bruno
-  Laboratorium, dept. DIBRIS
+- Barbara Bruno,
+  dept. DIBRIS
   Università degli Studi di Genova (Italy)
   barbara.bruno@unige.it
 
-- Fulvio Mastrogiovanni
-  Laboratorium, dept. DIBRIS
+- Fulvio Mastrogiovanni,
+  dept. DIBRIS
   Università degli Studi di Genova (Italy)
   fulvio.mastrogiovanni@unige.it
 
-- Antonio Sgorbissa
-  Laboratorium, dept. DIBRIS
+- Antonio Sgorbissa,
+  dept. DIBRIS
   Università degli Studi di Genova (Italy)
   antonio.sgorbissa@unige.it
 
