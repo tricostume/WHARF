@@ -1,4 +1,4 @@
-function [window numWritten] = CreateWindow(actual_sample,window,window_size,numWritten)
+function [window, numWritten] = CreateWindow(data_sample,window,window_size,numWritten)
 % function [window numWritten] = CreateWindow(actual_sample,window,window_size,numWritten)
 %
 % -------------------------------------------------------------------------
@@ -42,17 +42,11 @@ function [window numWritten] = CreateWindow(actual_sample,window,window_size,num
 %   ** this function is part of the code of ValidateWHARF:
 %   ** do NOT call it directly!
 
-% CONVERT THE ACCELEROMETER DATA INTO REAL ACCELERATION VALUES
-% mapping from [0..63] to [-14.709..+14.709]
-noisy_sample(1) = -14.709 + (actual_sample(1)/63)*(2*14.709);
-noisy_sample(2) = -14.709 + (actual_sample(2)/63)*(2*14.709);
-noisy_sample(3) = -14.709 + (actual_sample(3)/63)*(2*14.709);
-
 % COMPUTE THE ACTUAL WINDOW
 if(numWritten < window_size)
-    window(numWritten+1,:) = noisy_sample(:);
+    window(numWritten+1,:) = data_sample(:);
     numWritten = numWritten+1;
 else
     window = circshift(window,[-1 0]);
-    window(window_size,:) = noisy_sample;    
+    window(window_size,:) = data_sample;    
 end

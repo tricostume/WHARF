@@ -73,7 +73,8 @@ numFiles = length(files);
 for i=1:1:numFiles
     % transform the trial into a stream of samples
     currentFile = fopen([folder files(i).name],'r');
-    currentData = fscanf(currentFile,'%d\t%d\t%d\n',[3,inf]);
+    currentData = fscanf(currentFile,'a;%ld;%f;%f;%f\n',[4,inf]);
+    currentData = currentData(2:4,1:end);   % remove timestamp data
     numSamples = length(currentData(1,:));
     % create the log file
     res_folder = 'Data\RESULTS\';
