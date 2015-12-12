@@ -46,13 +46,43 @@
 % CREATE THE MODELS AND ASSOCIATED THRESHOLDS
 scale = 1.5;  % experimentally set scaling factor for the threshold computation
 
-% Open_Close_Curtains
-disp('Building Open_Close_Curtains model...');
-folder = 'Data\MODELS\Open_Close_Curtains_MODEL\';
-[OPEN_CLOSE_CURTAINSgP, OPEN_CLOSE_CURTAINSgS, OPEN_CLOSE_CURTAINSbP, OPEN_CLOSE_CURTAINSbS] = GenerateModel(folder);
-OPEN_CLOSE_CURTAINS_threshold = ComputeThreshold(OPEN_CLOSE_CURTAINSgP,OPEN_CLOSE_CURTAINSgS,OPEN_CLOSE_CURTAINSbP,OPEN_CLOSE_CURTAINSbS,scale);
-models(1) = struct('name',{'Opencurtains'},'gP',OPEN_CLOSE_CURTAINSgP,'gS',OPEN_CLOSE_CURTAINSgS,'bP',OPEN_CLOSE_CURTAINSbP,'bS',OPEN_CLOSE_CURTAINSbS,'threshold',OPEN_CLOSE_CURTAINS_threshold);
-clear OPEN_CLOSE_CURTAINSgP OPEN_CLOSE_CURTAINSgS OPEN_CLOSE_CURTAINSbP OPEN_CLOSE_CURTAINSbS OPEN_CLOSE_CURTAINS_threshold
+% Constants
+hand_strings = {'- Building left hand model...'; 
+                '- Building right hand model...'};
+hand_folders = {'LeftHand\', 'RightHand\'};
+
+% Models to be ran
+model_names = {'OpenCloseCurtains'};
+folders = {'Open_Close_Curtains_MODEL\'};
+
+% Preallocating models array struct
+models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', []), size(model_names, 2), 1 );
+
+% Builds all specified models
+for i=1:size(model_names, 2)
+    fprintf('Building %s model...\n', model_names{i});
+    folder = strcat('Data\MODELS\', folders{i});
+    models(i) = struct('name',{model_names{i}}, 'left_hand', [], 'right_hand', []);
+    % Builds specified models for each hand
+    for hand_index=1:2
+        % Get folder where hand model data is
+        disp(hand_strings{hand_index});
+        hand_folder = strcat(folder, hand_folders{hand_index});
+        % Generate models and compute thresholds
+        [model_gP, model_gS, model_bP, model_bS] = GenerateModel(hand_folder);
+        model_threshold = ComputeThreshold(model_gP,model_gS,model_bP,model_bS,scale);
+        hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
+        % Save hand model data into model struct
+        if hand_index==1
+            models(i).left_hand = hand_model;
+        else
+            models(1).right_hand = hand_model;
+        end
+        
+        clear model_gP model_gS model_bP model_bS model_threshold
+    end
+end
+clear hand_strings hand_folders model_names folders
 
 % SAVE THE MODELS IN THE CURRENT DIRECTORY
 save models_and_thresholds.mat
