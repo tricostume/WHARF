@@ -49,55 +49,68 @@ load models_and_thresholds.mat
 % DEFINE THE VALIDATION FOLDER TO BE USED
 folder = 'Data\VALIDATION\';
 
+% DEFINE CONSTANTS
+model_hands = {'left_hand', 'right_hand'};
+
 % DEFINE THE VALIDATION PARAMETERS
 % compute the size of the sliding window
 % (size of the largest model + 64 samples)
 numModels = length(models);
-models_size = zeros(1,numModels);
+numHands = size(model_hands, 2);
+models_size = zeros(1, numModels);
 for m=1:1:numModels
-    models_size(m) = size(models(m).bP,2)+64;
+    % Left hand model should have same size as hight hand, so just get one
+    % of them
+    models_size(m) = size(models(m).left_hand.bP,2)+64;
 end
 window_size = max(models_size);
 % create an array with the models thresholds
-thresholds = zeros(1,numModels);
+thresholds = zeros(numHands, numModels);
 for m=1:1:numModels
-    thresholds(m) = models(m).threshold;
+    for hand_index=1:numHands
+        thresholds(hand_index, m) = models(m).(model_hands{hand_index}).threshold;
+    end
 end
 % initialize the results arrays
-dist = zeros(1,numModels);
-possibilities = zeros(1,numModels);
+hand_dist = zeros(numHands, numModels);
+hand_possibilities = zeros(1, numModels, numHands);
+possibilities = zeros(1, numModels);
 
 % ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
-files = dir([folder,'*.txt']);
-numFiles = length(files);
+files = [dir([folder,'*_Left.txt'])';
+         dir([folder,'*_Right.txt'])'];
+% Get number of data entries. Number of left and right files should be the
+% same
 for i=1:1:numFiles
-    % transform the trial into a stream of samples
-    currentFile = fopen([folder files(i).name],'r');
-    currentData = fscanf(currentFile,'a;%ld;%f;%f;%f\n',[4,inf]);
-    currentData = currentData(2:4,1:end);   % remove timestamp data
-    numSamples = length(currentData(1,:));
     % create the log file
     res_folder = 'Data\RESULTS\';
-    resultFileName = [res_folder 'RES_' files(i).name];
-    % initialize the window of data to be used by the classifier
-    window = zeros(window_size,3);
-    numWritten = 0;
-    for j=1:1:numSamples
-        current_sample = currentData(:,j);
-        % update the sliding window with the current sample
-        [window numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
-        % analysis is meaningful only when we have enough samples
-        if (numWritten >= window_size)
-            % compute the acceleration components of the current window of samples
-            [gravity body] = AnalyzeActualWindow(window,window_size);
-            % compute the difference between the actual data and each model
-            for m=1:1:numModels
-                dist(m) = CompareWithModels(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),models(m).gP,models(m).gS,models(m).bP,models(m).bS);
+    resultFileName = [res_folder 'RES_' files(1, i).name];
+    for hand_index=1:1:numHands
+        % transform the trial into a stream of samples
+        current_file = fopen([folder files(hand_index, i).name],'r');
+        current_data = fscanf(current_file,'a;%ld;%f;%f;%f\n',[4,inf]);
+        current_data = current_data(2:4,1:end);   % remove timestamp data
+        numSamples = length(current_data(1,:));
+        % initialize the window of data to be used by the classifier
+        window = zeros(window_size,3);
+        numWritten = 0;
+        for j=1:1:numSamples
+            % update the sliding window with the current sample
+            [window numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
+            % analysis is meaningful only when we have enough samples
+            if (numWritten >= window_size)
+                % compute the acceleration components of the current window of samples
+                [gravity, body] = AnalyzeActualWindow(window,window_size);
+                % compute the difference between the actual data and each model
+                for m=1:1:numModels
+                    model = models(m).(model_hands{hand_index});
+                    hand_dist(hand_index, m) = CompareWithModels(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
+                end
+                % classify the current data
+                hand_possibilities(j,:, hand_index) = Classify(hand_dist(hand_index, :),thresholds(hand_index, :));
+            else
+                hand_possibilities(j,:, hand_index) = zeros(1,numModels);
             end
-            % classify the current data
-            possibilities(j,:) = Classify(dist,thresholds);
-        else
-            possibilities(j,:) = zeros(1,numModels);
         end
         % log the classification results in the log file
         label = num2str(possibilities(j,1));
