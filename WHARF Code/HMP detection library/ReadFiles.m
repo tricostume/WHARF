@@ -68,16 +68,30 @@ end
 files = dir([folder,'*.txt']);
 numFiles = length(files);
 dataFiles = zeros(1,numFiles);
+
 for i=1:1:numFiles
+    % READ DATA FROM FILES AND ELIMINATE TIME STEP INFORMATION
     dataFiles(i) = fopen([folder files(i).name],'r');
-    data = fscanf(dataFiles(i),'%d\t%d\t%d\n',[3,inf]);
-
-    % CONVERT THE ACCELEROMETER DATA INTO REAL ACCELERATION VALUES
-    % mapping from [0..63] to [-14.709..+14.709]
-    noisy_x(:,i) = -14.709 + (data(1,:)/63)*(2*14.709);
-    noisy_y(:,i) = -14.709 + (data(2,:)/63)*(2*14.709);
-    noisy_z(:,i) = -14.709 + (data(3,:)/63)*(2*14.709);
-
+    data = fscanf(dataFiles(i),'a;%ld;%f;%f;%f\n',[4,inf]);
+    data = data(2:4,1:end);
+    
+    % TODO: Remove this. This just cuts the end of the data to make them
+    % the same size
+    if i > 1
+        if size(noisy_x, 1) < size(data,2)
+            data = data(:,1:size(noisy_x,1));
+        else
+            noisy_x = noisy_x(1:size(data,2),:);
+            noisy_y = noisy_y(1:size(data,2),:);
+            noisy_z = noisy_z(1:size(data,2),:);
+        end
+    end
+    
+    % Append acceleration data into noisy_? matrices
+    noisy_x(:,i) = data(1,:);
+    noisy_y(:,i) = data(2,:);
+    noisy_z(:,i) = data(3,:);
+    
     % DEBUG: PLOT THE DATA COMING FROM EACH TRIAL
     if (debugMode == 1)
         numSamples = length(noisy_x(:,i));
