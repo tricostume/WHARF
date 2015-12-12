@@ -81,6 +81,7 @@ files = [dir([folder,'*_Left.txt'])';
          dir([folder,'*_Right.txt'])'];
 % Get number of data entries. Number of left and right files should be the
 % same
+numFiles = size(files, 2);
 for i=1:1:numFiles
     % create the log file
     res_folder = 'Data\RESULTS\';
@@ -95,6 +96,7 @@ for i=1:1:numFiles
         window = zeros(window_size,3);
         numWritten = 0;
         for j=1:1:numSamples
+            current_sample = current_data(:,j);
             % update the sliding window with the current sample
             [window numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
             % analysis is meaningful only when we have enough samples
@@ -113,6 +115,7 @@ for i=1:1:numFiles
             end
         end
         % log the classification results in the log file
+        possibilities = hand_possibilities(:,:, 1).*hand_possibilities(:,:, 2);
         label = num2str(possibilities(j,1));
         for m=2:1:numModels
             label = [label,' ',num2str(possibilities(j,m))];
