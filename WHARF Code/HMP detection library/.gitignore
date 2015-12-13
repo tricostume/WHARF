@@ -1,2 +1,5 @@
 # Ignore all data files, they should be in the separate WHARF_Data_Set folder
 /Data
+
+# Ignore MATLAB data files
+*.mat
