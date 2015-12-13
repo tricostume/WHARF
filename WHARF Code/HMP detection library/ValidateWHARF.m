@@ -78,9 +78,9 @@ hand_possibilities = zeros(1, numModels, numHands);
 possibilities = zeros(1, numModels);
 
 % ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
-files = [dir([folder,'*_Right.txt'])'];
+files = dir([folder,'*_Right.txt'])';
 % Get number of data entries.
-numFiles = size(trials_data, 2);
+numFiles = size(trials_data, 1);
 for i=1:1:numFiles
     % create the log file
     res_folder = 'Data\RESULTS\';
@@ -89,6 +89,9 @@ for i=1:1:numFiles
         % transform the trial into a stream of samples
         current_data = trials_data{i,hand_index}(2:4,1:end);   % remove timestamp data
         numSamples = size(current_data, 2);
+        if numSamples < window_size
+            continue
+        end
         % initialize the window of data to be used by the classifier
         window = zeros(window_size,3);
         numWritten = 0;
@@ -111,23 +114,30 @@ for i=1:1:numFiles
                 hand_possibilities(j,:, hand_index) = zeros(1,numModels);
             end
         end
-        % log the classification results in the log file
-        possibilities = hand_possibilities(:,:, 1).*hand_possibilities(:,:, 2);
-        label = num2str(possibilities(j,1));
-        for m=2:1:numModels
-            label = [label,' ',num2str(possibilities(j,m))];
-        end
-        label = [label,'\n'];
-        resultFile = fopen(resultFileName,'a');
-        fprintf(resultFile,label);
-        fclose(resultFile);
     end
+    
+    % If number of samples in trial is smaller than window size, ignore it
+    if numSamples < window_size
+        disp(['Trial ' int2str(i) ' data is smaller than one of the models, so we cant run it. Will skip it!']);
+        continue
+    end
+    
+    % log the classification results in the log file
+    possibilities = hand_possibilities(:,:, 1).*hand_possibilities(:,:, 2);
+    label = num2str(possibilities(j,1));
+    for m=2:1:numModels
+        label = [label,' ',num2str(possibilities(j,m))];
+    end
+    label = [label,'\n'];
+    resultFile = fopen(resultFileName,'a');
+    fprintf(resultFile,label);
+    fclose(resultFile);
+    
     % plot the possibilities curves for the models
     x = window_size:1:numSamples;
-    keyboard
     figure,
         plot(x,possibilities(window_size:end,:));
         h = legend(models(:).name,numModels);
         set(h,'Interpreter','none')
-    clear possibilities;
+    clear possibilities hand_possibilities hand_dist;
 end
