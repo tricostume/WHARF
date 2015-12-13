@@ -1,4 +1,4 @@
-function [x_set y_set z_set numSamples] = ReadFiles(folder,debugMode)
+function [timestamps, x_set, y_set, z_set, numSamples] = ReadFiles(folder,debugMode)
 % function [x_set y_set z_set numSamples] = ReadFiles(folder,debugMode)
 %
 % -------------------------------------------------------------------------
@@ -73,24 +73,19 @@ for i=1:1:numFiles
     % READ DATA FROM FILES AND ELIMINATE TIME STEP INFORMATION
     dataFiles(i) = fopen([folder files(i).name],'r');
     data = fscanf(dataFiles(i),'a;%ld;%f;%f;%f\n',[4,inf]);
-    data = data(2:4,1:end);
     
-    % TODO: Remove this. This just cuts the end of the data to make them
-    % the same size
-    if i > 1
-        if size(noisy_x, 1) < size(data,2)
-            data = data(:,1:size(noisy_x,1));
-        else
-            noisy_x = noisy_x(1:size(data,2),:);
-            noisy_y = noisy_y(1:size(data,2),:);
-            noisy_z = noisy_z(1:size(data,2),:);
-        end
+    % Preallocate matrices for efficiency
+    if i==1
+        timestamps = zeros(size(data,2),numFiles);
+        noisy_x = zeros(size(data,2),numFiles);
+        noisy_y = zeros(size(data,2),numFiles);
+        noisy_z = zeros(size(data,2),numFiles);
     end
-    
     % Append acceleration data into noisy_? matrices
-    noisy_x(:,i) = data(1,:);
-    noisy_y(:,i) = data(2,:);
-    noisy_z(:,i) = data(3,:);
+    timestamps(:,i) = data(1,:);
+    noisy_x(:,i) = data(2,:);
+    noisy_y(:,i) = data(3,:);
+    noisy_z(:,i) = data(4,:);
     
     % DEBUG: PLOT THE DATA COMING FROM EACH TRIAL
     if (debugMode == 1)
