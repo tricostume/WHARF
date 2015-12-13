@@ -10,9 +10,10 @@
 % watches in BuildWHARF and ValidateWHARF. This data should be placed in
 % the DATA/SYNCHRONOUS/ folder, with right and left hand data named as, 
 % respectively, XXXXX_Right.txt and XXXXX_Left.txt.
+clear all;
 
 % Get files in SYNCHRONIZATION data folder
-folder = 'Data\SYNCHRONIZATION\';
+folder = 'Data\SYNCHRONIZATION\Day02\';
 files = [dir([folder,'*_Left.txt'])';
          dir([folder,'*_Right.txt'])'];
 % Get number of data entries. Number of left and right files is assumed to
