@@ -46,7 +46,7 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
 %   [CLIMB_gP CLIMB_gS CLIMB_bP CLIMB_bS] = GenerateModel(folder);
 
 % READ THE ACCELEROMETER RAW DATA FROM FILES
-[x_set y_set z_set numSamples] = ReadFiles(folder,0);
+[x_set y_set z_set numSamples] = ReadFiles(folder,0); 
 
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
 % ... AND CREATE THE DATASETS FOR GM-MODELING
