@@ -1,6 +1,11 @@
-function [ trials_data ] = GetTimeSyncedData( folder )
+function [ trials_data ] = GetTimeSyncedData( folder, filter_data )
 %GETTIMESYNCEDDATA Summary of this function goes here
 %   Detailed explanation goes here
+
+    % DEFINE THE VALUE FOR FLAG debugMode
+    if nargin < 2 || isempty(filter_data)
+        filter_data = 0;
+    end
 
     % LOAD THE DELTA TIME BETWEEN WATCHES FOR SYNCHRONIZATION
     load delta_time_sync.mat
@@ -39,6 +44,19 @@ function [ trials_data ] = GetTimeSyncedData( folder )
         data_size = min(size(trials_data{i, left_watch}, 2), size(trials_data{i, right_watch}, 2));
         trials_data{i, left_watch} = trials_data{i, left_watch}(:,1:data_size);
         trials_data{i, right_watch} = trials_data{i, right_watch}(:,1:data_size);
+    end
+    
+    % If filtering data, use a median filter with a window of size n=3
+    if filter_data
+        % median filter parameters
+        n = 3;      % order of the median filter
+        % Filter data for all trials and all axis (x, y, z)
+        for i=1:1:num_trials
+            for j=2:size(trials_data{i, left_watch}, 1)
+                trials_data{i, left_watch}(j,:) = medfilt1(trials_data{i, left_watch}(j,:),n);
+                trials_data{i, right_watch}(j,:) = medfilt1(trials_data{i, right_watch}(j,:),n);
+            end
+        end
     end
 end
 
