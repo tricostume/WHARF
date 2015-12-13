@@ -48,6 +48,7 @@ load models_and_thresholds.mat
 
 % DEFINE THE VALIDATION FOLDER TO BE USED
 folder = 'Data\VALIDATION\';
+trials_data = GetTimeSyncedData(folder);
 
 % DEFINE CONSTANTS
 model_hands = {'left_hand', 'right_hand'};

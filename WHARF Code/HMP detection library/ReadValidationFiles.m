@@ -1,9 +1,8 @@
-function [ files_data ] = ReadValidationFiles( )
+function [ files_data ] = ReadValidationFiles( folder )
 %READVALIDATIONFILES Summary of this function goes here
 %   Detailed explanation goes here
 
     % DEFINE THE VALIDATION FOLDER TO BE USED
-    folder = 'Data\VALIDATION\';
     files = [dir([folder,'*_Left.txt'])';
              dir([folder,'*_Right.txt'])'];
     

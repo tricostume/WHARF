@@ -1,4 +1,4 @@
-function [ trials_data ] = GetTimeSyncedData(  )
+function [ trials_data ] = GetTimeSyncedData( folder )
 %GETTIMESYNCEDDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -6,7 +6,7 @@ function [ trials_data ] = GetTimeSyncedData(  )
     load delta_time_sync.mat
 
     % Get all trials data
-    trials_data = ReadValidationFiles();
+    trials_data = ReadValidationFiles(folder);
     num_trials = size(trials_data, 1);
     
     for i=1:1:num_trials
