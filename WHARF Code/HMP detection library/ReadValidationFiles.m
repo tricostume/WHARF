@@ -1,4 +1,4 @@
-function [ files_data ] = ReadValidationFiles( folder )
+function [ files_data, trial_names ] = ReadValidationFiles( folder )
 %READVALIDATIONFILES Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -16,6 +16,11 @@ function [ files_data ] = ReadValidationFiles( folder )
             current_file = fopen([folder files(hand_index, i).name],'r');
             files_data{i, hand_index} = fscanf(current_file,'a;%ld;%f;%f;%f\n',[4,inf]);
         end
+    end
+    
+    trial_names = cell(num_files,1);
+    for i = 1:num_files
+        trial_names{i} = files(1,i).name(1:end-9);
     end
 end
 
