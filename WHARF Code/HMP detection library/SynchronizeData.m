@@ -1,4 +1,4 @@
-function [ trials_data ] = SynchronizeData( folder )
+function [ trials_data ] = SynchronizeData( subfolder )
 %SYNCHRONIZEDATA Summary of this function goes here
 %   Detailed explanation goes here
     
@@ -10,7 +10,7 @@ function [ trials_data ] = SynchronizeData( folder )
     right_watch = 2;
     
     folder_pattern = '(Day\d+)_(\w+)_(MODEL|VALIDATION)\\';
-    tokens = regexp(folder, folder_pattern, 'tokens');
+    tokens = regexp(subfolder, folder_pattern, 'tokens');
     
     sync_subfolder = [tokens{1}{1} '\'];
     data_name = tokens{1}{2};
@@ -21,7 +21,7 @@ function [ trials_data ] = SynchronizeData( folder )
     delta_time = FindWatchesSyncTimeDiff(sync_subfolder);
 
     % Get all trials data
-    [trials_data, trials_names] = ReadValidationFiles([UNSYNCED_DATA_FOLDER folder]);
+    [trials_data, trials_names] = ReadValidationFiles([UNSYNCED_DATA_FOLDER subfolder]);
     num_trials = size(trials_data, 1);
     
     for i=1:1:num_trials
@@ -72,7 +72,7 @@ function [ trials_data ] = SynchronizeData( folder )
         case 'VALIDATION'
             
         otherwise
-            disp(['Invalid data type in folder ' folder]);
+            disp(['Invalid data type in folder ' subfolder]);
     end
 end
 
