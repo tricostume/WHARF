@@ -70,7 +70,16 @@ function [ trials_data ] = SynchronizeData( subfolder )
                 save([trials_folder trials_names{i} '.mat'], 'single_trial_data');
             end
         case 'VALIDATION'
-            
+            trials_folder = [VALIDATION_FOLDER data_name '_' data_type '\'];
+            if ~isdir(trials_folder)
+                mkdir(trials_folder);
+            end
+            for i=1:1:num_trials
+                clear single_trial_data;
+                single_trial_data{left_watch} = trials_data{i,left_watch};
+                single_trial_data{right_watch} = trials_data{i,right_watch};
+                save([trials_folder trials_names{i} '.mat'], 'single_trial_data');
+            end
         otherwise
             disp(['Invalid data type in folder ' subfolder]);
     end
