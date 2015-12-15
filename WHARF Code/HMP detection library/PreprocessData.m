@@ -6,7 +6,7 @@ function [ processed_data ] = PreprocessData( folder )
 % raw_data {trial,side}
     % READ THE ACCELEROMETER DATA FILES
     ub=1000; %buffer (assumed)
-    raw_data=GetTimeSyncedData(folder, 1);
+    raw_data=GetTrialsData(folder);
     numFiles = length(raw_data); 
     dataFiles = zeros(1,numFiles);
     x_set=[];
@@ -112,9 +112,7 @@ function [ processed_data ] = PreprocessData( folder )
     processed_data.right.y = y_set2;
     processed_data.left.z = z_set1;
     processed_data.right.z = z_set2;
-    processed_data.size = length(x_set1(1,:));
-    
-    
+    processed_data.size = length(x_set1(:,1)); 
     
 function myprecallback(obj,evd)
     disp('A pan is about to occur.');
