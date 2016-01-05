@@ -112,7 +112,7 @@ function [ processed_data ] = PreprocessData( folder )
     processed_data.right.y = y_set2;
     processed_data.left.z = z_set1;
     processed_data.right.z = z_set2;
-    processed_data.size = length(x_set1(:,1)); 
+    processed_data.size = length(x_set1(1,:)); 
     
 function myprecallback(obj,evd)
     disp('A pan is about to occur.');

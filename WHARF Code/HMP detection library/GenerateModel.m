@@ -1,4 +1,4 @@
-function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
+function [gr_points gr_sigma b_points b_sigma] = GenerateModel(modelfile,hand_index)
 % function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
 %
 % -------------------------------------------------------------------------
@@ -32,9 +32,9 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
 % - 4D body acceleration (time, body acc. components on the 3 axes)
 %
 % Input:
-%   folder --> directory containing the accelerometer output files to be
-%              used as modelling dataset for a HMP
-%
+%   modelfile --> the mat file containing the data of the model in consideration
+%   hand_index --> parameter defining which the hand in consideration
+%   (left==1/right==2)
 % Output:
 %   gr_points --> expected curve of the gravity feature
 %   gr_sigma --> associated covariance matrices
@@ -42,11 +42,10 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
 %   b_sigma --> associated covariance matrices
 %
 % Example:
-%   folder = 'Data\MODELS\Climb_stairs_MODEL\';
-%   [CLIMB_gP CLIMB_gS CLIMB_bP CLIMB_bS] = GenerateModel(folder);
+% {An example of the code goes here}
 
-% READ THE ACCELEROMETER RAW DATA FROM FILES
-[x_set y_set z_set numSamples] = ReadFiles(folder,0); 
+% EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
+[x_set y_set z_set numSamples] = GetProcessedData(modelfile,hand_index);
 
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
 % ... AND CREATE THE DATASETS FOR GM-MODELING

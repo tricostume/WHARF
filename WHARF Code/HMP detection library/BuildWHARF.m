@@ -47,13 +47,12 @@
 scale = 1.5;  % experimentally set scaling factor for the threshold computation
 
 % Constants
-hand_strings = {'- Building left hand model...'; 
+hand_strings = {'- Building left hand model...';
                 '- Building right hand model...'};
-hand_folders = {'LeftHand\', 'RightHand\'};
 
 % Models to be ran
-model_names = {'OpenCloseCurtains'};
-folders = {'Open_Close_Curtains_MODEL\'};
+model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap'};
+folder = 'Data\PREPROCESSED_DATA\';
 
 % Preallocating models array struct
 models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', []), size(model_names, 2), 1 );
@@ -61,22 +60,21 @@ models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', []), size(mod
 % Builds all specified models
 for i=1:size(model_names, 2)
     fprintf('Building %s model...\n', model_names{i});
-    folder = strcat('Data\MODELS\', folders{i});
     models(i) = struct('name',{model_names{i}}, 'left_hand', [], 'right_hand', []);
+    %Getting the required mat file for the model into consideration
+    modelfile= strcat(folder, model_names{i}, '_PREPROCESSED.mat');
     % Builds specified models for each hand
     for hand_index=1:2
-        % Get folder where hand model data is
         disp(hand_strings{hand_index});
-        hand_folder = strcat(folder, hand_folders{hand_index});
         % Generate models and compute thresholds
-        [model_gP, model_gS, model_bP, model_bS] = GenerateModel(hand_folder);
+        [model_gP, model_gS, model_bP, model_bS] = GenerateModel(modelfile,hand_index);
         model_threshold = ComputeThreshold(model_gP,model_gS,model_bP,model_bS,scale);
         hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
         % Save hand model data into model struct
         if hand_index==1
             models(i).left_hand = hand_model;
         else
-            models(1).right_hand = hand_model;
+            models(i).right_hand = hand_model;
         end
         
         clear model_gP model_gS model_bP model_bS model_threshold
