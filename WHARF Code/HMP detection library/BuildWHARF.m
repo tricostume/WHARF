@@ -66,8 +66,10 @@ for i=1:size(model_names, 2)
     % Builds specified models for each hand
     for hand_index=1:2
         disp(hand_strings{hand_index});
+        % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
+        [x_set y_set z_set numSamples] = GetProcessedData(modelfile,hand_index);
         % Generate models and compute thresholds
-        [model_gP, model_gS, model_bP, model_bS] = GenerateModel(modelfile,hand_index);
+        [model_gP, model_gS, model_bP, model_bS] = GenerateModel(x_set,y_set,z_set,numSamples);
         model_threshold = ComputeThreshold(model_gP,model_gS,model_bP,model_bS,scale);
         hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
         % Save hand model data into model struct

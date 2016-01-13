@@ -1,4 +1,4 @@
-function [gr_points gr_sigma b_points b_sigma] = GenerateModel(modelfile,hand_index)
+function [gr_points gr_sigma b_points b_sigma] = GenerateModel(x_set,y_set,z_set,numSamples)
 % function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
 %
 % -------------------------------------------------------------------------
@@ -43,9 +43,6 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel(modelfile,hand_in
 %
 % Example:
 % {An example of the code goes here}
-
-% EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
-[x_set y_set z_set numSamples] = GetProcessedData(modelfile,hand_index);
 
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
 % ... AND CREATE THE DATASETS FOR GM-MODELING
