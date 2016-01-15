@@ -7,7 +7,7 @@ function [ x_set y_set z_set numSamples ] = GetProcessedData( modelfile,hand_ind
 %   modelfile --> the mat file containing the data of the model in consideration
 %   hand_index --> parameter defining which the hand in consideration
 %   (left==1/right==2)
-% Outpt arguments: 
+% Outpt arguments:
 %   x_set --> acceleration values measured along the x axis in each file
 %             at each given time instant (each column corresponds to the
 %             x axis of a file)
@@ -21,20 +21,20 @@ function [ x_set y_set z_set numSamples ] = GetProcessedData( modelfile,hand_ind
 %                  each file (number of rows in the files, that must be
 %                  same for ALL files)
 
-%Loading the mat  file
-prdata=matfile(modelfile);
-%Extracting the data
-numSamples=prdata.numSamples;
-if(hand_index==1)
-   x_set=prdata.left_x';
-   y_set=prdata.left_y';
-   z_set=prdata.left_z';
-elseif(hand_index==2)
-   x_set=prdata.right_x';
-   y_set=prdata.right_y';
-   z_set=prdata.right_z';
-else
-   disp('Invalid Hand Index');
-end
+    %Loading the mat  file
+    prdata=matfile(modelfile);
+    %Extracting the data
+    numSamples=prdata.numSamples;
+    if(hand_index==1)
+       x_set=prdata.processed_data.left.x';
+       y_set=prdata.processed_data.left.y';
+       z_set=prdata.processed_data.left.z';
+    elseif(hand_index==2)
+       x_set=prdata.processed_data.right.x';
+       y_set=prdata.processed_data.right.y';
+       z_set=prdata.processed_data.right.z';
+    else
+       disp('Invalid Hand Index');
+    end
 
 end
