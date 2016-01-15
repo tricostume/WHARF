@@ -1,15 +1,44 @@
+% -------------------------------------------------------------------------
+% Author: Tiago P M da Silva (dept. DIBRIS, University of Genova, ITALY)
+%         Divya Haresh Shah (dept. DIBRIS, University of Genova, ITALY)
+%         Ernesto Denicia (dept. DIBRIS, University of Genova, ITALY)
+%
+% 
+% -------------------------------------------------------------------------
+% This function is associated to the public dataset WHARF Data Set.
+% (free download at: https://github.com/tiagopms/WHARF)
+% 
+% -------------------------------------------------------------------------
+%
+% SyncDataWHARF, using raw acceleration data from two smart watches,
+% generates time synced data with respect to the timestamps on both 
+% datasets. It goes through all the subfolders inside the 
+% UNSYNCED_DATA_FOLDER, this subfolders should be named:
+%   - '(\d{2}\.\d{2}\.\d{2})_(\w+)_(MODEL|VALIDATION)(_TIMEDIFF)?\\'
+%     . The date the data was taken (as yy.mm.dd)
+%     . The name of the activity
+%     . If this is a MODEL or VALIDATION data
+%     . Include _TIMEDIFF if the watches data have a delta_time between
+%       their timestamp data
+% Inside each subfolder there should be a equal number of files named:
+%   - '*_Right.txt'
+%   - '*_Left.txt'
+% Relative to the data taken from the left hand watch and the right hand
+% one. Related files should have identical names, which means, file 
+% DEADBEEF_Left.txt should be relative to file DEADBEEF_Right.txt.
+%
 
 % Constants declaration
 UNSYNCED_DATA_FOLDER = 'Data\UNSYNCED_DATA\';
 
 % Get list of data to be synced
-files = dir(UNSYNCED_DATA_FOLDER);
-files = files(~ismember({files.name},{'.','..'}));
+subfolders = dir(UNSYNCED_DATA_FOLDER);
+subfolders = subfolders(~ismember({subfolders.name},{'.','..'}));
 
 % Builds all specified models
-for i=1:length(files)
-    folder = [files(i).name '\'];
-    fprintf('Syncing %s folder...\n', folder);
+for i=1:length(subfolders)
+    subfolder = [subfolders(i).name '\'];
+    fprintf('Syncing %s folder...\n', subfolder);
     % Synchronizes and saves data in specified folder
-    SynchronizeData(folder);
+    SynchronizeData(subfolder);
 end

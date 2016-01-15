@@ -3,6 +3,8 @@ function [delta_time] = FindWatchesSyncTimeDiff(subfolder)
 %
 % -------------------------------------------------------------------------
 % Author: Tiago Pimentel (dept. DIBRIS, University of Genova, ITALY)
+%         Divya Haresh Shah (dept. DIBRIS, University of Genova, ITALY)
+%         Ernesto Denicia (dept. DIBRIS, University of Genova, ITALY)
 %
 % -------------------------------------------------------------------------
 %
@@ -11,18 +13,27 @@ function [delta_time] = FindWatchesSyncTimeDiff(subfolder)
 % be taken by starting both watches at, as preciselly as possible, the same
 % time, and this time difference is used as reference to synchronize both
 % watches in BuildWHARF and ValidateWHARF. This data should be placed in
-% the DATA/SYNCHRONOUS/ folder, with right and left hand data named as, 
-% respectively, XXXXX_Right.txt and XXXXX_Left.txt.
+% a subfolder inside DATA/SYNCHRONOUS/.
+% Inside each subfolder there should be a equal number of files named:
+%   - '*_Right.txt'
+%   - '*_Left.txt'
+% Relative to the data taken from the left hand watch and the right hand
+% one. Related files should have identical names, which means, file 
+% DEADBEEF_Left.txt should be relative to file DEADBEEF_Right.txt.
 %
 % Input:
-%   subfolder --> directory inside 'Data\SYNCHRONOUS\' foldder containing
+%   subfolder --> directory inside 'Data\SYNCHRONOUS\' folder containing
 %               the reference files to be used as truth values for
-%               sinchronization
+%               sinchronization. This subfolder should be named 
+%               SYNC_yy.mm.dd, with the acquisition date in its name.
 %
 % Output:
 %   delta_time --> reference delta_time between the two watches to be used
 %               for data synchronization
 %
+% Examples:
+%   subfolder = 'SYNC_15.12.12\';
+%   delta_time = FindWatchesSyncTimeDiff(subfolder);
 
     % Get files in SYNCHRONIZATION data folder
     sync_folder = 'Data\SYNCHRONIZATION\';
