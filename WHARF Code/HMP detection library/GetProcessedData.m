@@ -1,13 +1,22 @@
 function [ x_set, y_set, z_set, numSamples ] = GetProcessedData( modelfile, hand_index )
-%GETPROCESSEDDATA Summary of this function goes here
-
-% This function is used to extract the data in the matrix form from the
-% preprocessed data mat files. 
-% Input arguments: 
-%   modelfile --> the mat file containing the data of the model in consideration
-%   hand_index --> parameter defining which the hand in consideration
-%   (left==1/right==2)
-% Outpt arguments:
+%GETPROCESSEDDATA Get preprocessed data for a single activity
+% 
+% -------------------------------------------------------------------------
+% Author: Tiago P M da Silva (dept. DIBRIS, University of Genova, ITALY)
+%         Divya Haresh Shah (dept. DIBRIS, University of Genova, ITALY)
+%         Ernesto Denicia (dept. DIBRIS, University of Genova, ITALY)
+%
+% -------------------------------------------------------------------------
+% 
+% GetProcessedData is used to extract the data in the matrix form from the
+% preprocessed data mat files.
+%
+% Input:
+%   modelfile --> the mat file containing the data of the wanted activity
+%   hand_index --> parameter defining which is the hand in consideration
+%                  (left==1 / right==2)
+%
+% Output:
 %   x_set --> acceleration values measured along the x axis in each file
 %             at each given time instant (each column corresponds to the
 %             x axis of a file)
@@ -20,10 +29,17 @@ function [ x_set, y_set, z_set, numSamples ] = GetProcessedData( modelfile, hand
 %   numSamples --> number of sample points measured by the accelerometer in
 %                  each file (number of rows in the files, that must be
 %                  same for ALL files)
+%
+% Examples:
+%   file = 'Data\PREPROCESSED_DATA\OpenCloseCurtains_PREPROCESSED.mat';
+%   hand_index = 1; % Left hand.
+%   [ x_set, y_set, z_set, numSamples ] = GetProcessedData( file, ...
+%                                                   hand_index );
 
     %Loading the mat  file
     prdata = matfile(modelfile);
     processed_data = prdata.processed_data;
+    
     %Extracting the data
     numSamples = processed_data.size;
     if(hand_index==1)
