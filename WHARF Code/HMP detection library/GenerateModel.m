@@ -1,9 +1,14 @@
-function [gr_points gr_sigma b_points b_sigma] = GenerateModel(x_set,y_set,z_set,numSamples)
-% function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
+function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel(x_set, y_set, z_set, numSamples)
+%GENERATEMODEL Generate gravity and body model for a activity
 %
 % -------------------------------------------------------------------------
-% Author: Barbara Bruno (dept. DIBRIS, University of Genova, ITALY)
+% Authors: Tiago P M da Silva (dept. DIBRIS, University of Genova, ITALY)
+%          Divya Haresh Shah (dept. DIBRIS, University of Genova, ITALY)
+%          Ernesto Denicia (dept. DIBRIS, University of Genova, ITALY)
+%          Barbara Bruno (dept. DIBRIS, University of Genova, ITALY)
 %
+% -------------------------------------------------------------------------
+% -------------------------------------------------------------------------
 % This code is the implementation of the algorithms described in the
 % paper "Human motion modeling and recognition: a computational approach".
 %
@@ -20,21 +25,24 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel(x_set,y_set,z_set
 % }
 % -------------------------------------------------------------------------
 %
-% GenerateModel assumes the trials provided in [folder] to be the
-% modelling dataset of a Human Motion Primitive (HMP) and returns the model
-% of the HMP computed by executing Gaussian Mixture Modelling (GMM) and
-% Gaussian Mixture Regression (GMR) over the modelling dataset. The
-% model is defined by the expected curve and associated set of covariance
-% matrices of the features extracted from the trials.
+% GenerateModel assumes the trials provided in [x_set, y_set, z_set,
+% numSamples] to be the modelling dataset of a Human Motion Primitive (HMP)
+% and returns the model of the HMP computed by executing Gaussian Mixture
+% Modelling (GMM) and Gaussian Mixture Regression (GMR) over the modelling
+% dataset. The model is defined by the expected curve and associated set of
+% covariance matrices of the features extracted from the trials.
 %
 % Actually considered features are:
-% - 4D gravity (time, gravity components on the 3 axes)
-% - 4D body acceleration (time, body acc. components on the 3 axes)
+% - 4D gravity (time (as a step index), gravity components on the 3 axes)
+% - 4D body acceleration (time (as a step index), body acc. components on
+%                           the 3 axes)
 %
 % Input:
-%   modelfile --> the mat file containing the data of the model in consideration
-%   hand_index --> parameter defining which the hand in consideration
-%   (left==1/right==2)
+%   x_set --> vector containing x axis acceleration
+%   y_set --> vector containing y axis acceleration
+%   z_set --> vector containing z axis acceleration
+%   numSamples --> size of acceleration vectors
+% 
 % Output:
 %   gr_points --> expected curve of the gravity feature
 %   gr_sigma --> associated covariance matrices
@@ -42,7 +50,12 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel(x_set,y_set,z_set
 %   b_sigma --> associated covariance matrices
 %
 % Example:
-% {An example of the code goes here}
+%   file = 'Data\PREPROCESSED_DATA\OpenCloseCurtains_PREPROCESSED.mat';
+%   hand_index = 1; % Left hand.
+%   [ x_set, y_set, z_set, numSamples ] = GetProcessedData( file, ...
+%                                                   hand_index );
+%   [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel(x_set, ...
+%                                       y_set, z_set, numSamples);
 
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
 % ... AND CREATE THE DATASETS FOR GM-MODELING

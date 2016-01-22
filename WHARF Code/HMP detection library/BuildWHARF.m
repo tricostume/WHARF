@@ -66,7 +66,7 @@ for i=1:size(model_names, 2)
     fprintf('Building %s model...\n', model_names{i});
     models(i) = struct('name',{model_names{i}}, 'left_hand', [], 'right_hand', []);
     %Getting the required mat file for the model into consideration
-    modelfile= strcat(folder, model_names{i}, '_PREPROCESSED.mat');
+    modelfile = strcat(folder, model_names{i}, '_PREPROCESSED.mat');
     % Builds specified models for each hand
     for hand_index=1:2
         disp(hand_strings{hand_index});
