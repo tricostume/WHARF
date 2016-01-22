@@ -1,5 +1,11 @@
 % -------------------------------------------------------------------------
-% Author: Barbara Bruno (dept. DIBRIS, University of Genova, ITALY)
+% Authors: Tiago P M da Silva (dept. DIBRIS, University of Genova, ITALY)
+%          Divya Haresh Shah (dept. DIBRIS, University of Genova, ITALY)
+%          Ernesto Denicia (dept. DIBRIS, University of Genova, ITALY)
+%          Barbara Bruno (dept. DIBRIS, University of Genova, ITALY)
+%
+% -------------------------------------------------------------------------
+% -------------------------------------------------------------------------
 %
 % This code is the implementation of the algorithms described in the
 % paper "Analysis of human behavior recognition algorithms based on
@@ -41,6 +47,9 @@
 % dataset. It feeds the Classifier with the samples recorded in one
 % validation trial one-by-one, waiting for the completion of the previous
 % classification before feeding the Classifier with a new sample.
+% So as to validate two handed tasks, it assumes they are independent and
+% multiplies their probabilities together to get the probability of the
+% joint action.
 
 % LOAD THE MODELS OF THE HMP IN HMPDATASET
 % (models of the known activities and classification thresholds)
@@ -105,7 +114,7 @@ for i=1:length(folders)
             for j=1:1:numSamples
                 current_sample = current_data(:,j);
                 % update the sliding window with the current sample
-                [window numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
+                [window, numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
                 % analysis is meaningful only when we have enough samples
                 if (numWritten >= window_size)
                     % compute the acceleration components of the current window of samples

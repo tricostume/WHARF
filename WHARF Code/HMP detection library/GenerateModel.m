@@ -72,8 +72,8 @@ scaling_factor = 10/10;
 numGMRPoints = ceil(numPoints*scaling_factor);
 % 3) perform Gaussian Mixture Modelling and Regression to retrieve the
 %    expected curve and associated covariance matrices for each feature
-[gr_points gr_sigma] = GetExpected(gravity,K_gravity,numGMRPoints,0);
-[b_points b_sigma] = GetExpected(body,K_body,numGMRPoints,0);
+[gr_points, gr_sigma] = GetExpected(gravity, K_gravity, numGMRPoints,0);
+[b_points, b_sigma] = GetExpected(body, K_body, numGMRPoints,0);
 
 % DISPLAY THE RESULTS
 % display the GMR results for the GRAVITY and BODY ACC. features projected
