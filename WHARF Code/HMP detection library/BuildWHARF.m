@@ -1,6 +1,11 @@
 % -------------------------------------------------------------------------
-% Author: Barbara Bruno (dept. DIBRIS, University of Genova, ITALY)
+% Authors: Tiago P M da Silva (dept. DIBRIS, University of Genova, ITALY)
+%          Divya Haresh Shah (dept. DIBRIS, University of Genova, ITALY)
+%          Ernesto Denicia (dept. DIBRIS, University of Genova, ITALY)
+%          Barbara Bruno (dept. DIBRIS, University of Genova, ITALY)
 %
+% -------------------------------------------------------------------------
+% -------------------------------------------------------------------------
 % This code is the implementation of the algorithms described in the
 % paper "Human motion modeling and recognition: a computational approach".
 %
@@ -35,20 +40,19 @@
 % }
 % -------------------------------------------------------------------------
 %
-% BuildWHARF creates the models (with the Gaussian Mixture Modelling
-% and Regression procedure) of the HMP of WHARF Data Set, each represented
-% by a set of modelling trials stored in a specific folder. The module
-% calls the fuction GenerateModel for each motion passing it the
-% appropriate modelling folder. In addition, the function computes the
-% model-specific threshold to be later used by the Classifier to
+% BuildWHARF creates the single handed models (with the Gaussian Mixture 
+% Modelling and Regression procedure) of the HMP of WHARF Data Set, each
+% represented by a set of modelling trials stored in a specific 
+% preprocessed file. This file should be generated with SyncDataWHARF and
+% PreprocessDataWHARF. In addition, the function computes the
+% model-specific threshold to be later used by the Classifier to 
 % discriminate between known and unknown motions.
 
-% CREATE THE MODELS AND ASSOCIATED THRESHOLDS
-scale = 1.5;  % experimentally set scaling factor for the threshold computation
-
+% Create the models and associated thresholds
 % Constants
 hand_strings = {'- Building left hand model...';
                 '- Building right hand model...'};
+scale = 1.5;  % experimentally set scaling factor for the threshold computation
 
 % Models to be ran
 model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap'};
