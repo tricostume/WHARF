@@ -76,7 +76,7 @@ end
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS
 numFiles = size(x_set,2);
 % first trial outside of the loop to have meaningful initial values
-[gravity_trial body_trial] = GetComponents(numSamples,x_set(:,1),y_set(:,1),z_set(:,1),0);
+[gravity_trial, body_trial] = GetComponents(numSamples,x_set(:,1),y_set(:,1),z_set(:,1),0);
 shortNumSamples = size(gravity_trial,1);
 % initial values of the dataset arrays
 time = 1:shortNumSamples;

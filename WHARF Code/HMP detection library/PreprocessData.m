@@ -4,115 +4,130 @@ function [ processed_data ] = PreprocessData( folder )
 %you trim the data.
 % left 1 right 2
 % raw_data {trial,side}
-    % READ THE ACCELEROMETER DATA FILES
-    ub=1000; %buffer (assumed)
-    raw_data=GetTrialsData(folder);
-    numFiles = length(raw_data); 
-    dataFiles = zeros(1,numFiles);
-    x_set=[];
-    y_set=[];
-    z_set=[];
-    i=1;
+    % Constants declaration.
+    left_index = 1;
+    right_index = 2;
 
-    data1l = raw_data{1,1};
-    data1r = raw_data{1,2};
-    %figure(1);
-        x=1:size(data1l, 2);
-        ax(1)=subplot(3,1,1);plot(x,data1l(2,:), x, data1r(2,:)); hold on;
-        title('Check if this is your desired data');
-        ax(2)=subplot(3,1,2);plot(x,data1l(3,:), x, data1r(3,:));
-        ax(3)=subplot(3,1,3);plot(x,data1l(4,:), x, data1r(4,:));
-        linkaxes(ax,'x');
-        pause;
+    % Read the accelerometers data files and get longest trial size
+    raw_data = GetTrialsData(folder);
+    num_files = length(raw_data);
+    [max_size, max_index] = max(cellfun('size', raw_data, 2));
+    max_trial_size = max_size(1);
 
-        x_set1=[x_set;[data1l(2,1:end),zeros(1,ub-size(data1l,2))]];
-        x_set2=[x_set;[data1r(2,1:end),zeros(1,ub-size(data1r,2))]];
-        y_set1=[y_set;[data1l(3,1:end),zeros(1,ub-size(data1l,2))]];
-        y_set2=[y_set;[data1r(3,1:end),zeros(1,ub-size(data1r,2))]];
-        z_set1=[z_set;[data1l(4,1:end),zeros(1,ub-size(data1l,2))]];
-        z_set2=[z_set;[data1r(4,1:end),zeros(1,ub-size(data1r,2))]];
-        close all;
-    for i=2:1:numFiles
-        datal = raw_data{i,1};
-        datar = raw_data{i,2};
+    % Get first data trial
+    data1_left = raw_data{1, left_index};
+    data1_right = raw_data{1, right_index};
+    
+    % Plot data from first trial
+    close all
+    x = 1:size(data1_left, 2);
+    ax(1) = subplot(3,1,1);plot(x,data1_left(2,:), x, data1_right(2,:)); hold on;
+    title('Check if this is your desired data');
+    ax(2) = subplot(3,1,2);plot(x,data1_left(3,:), x, data1_right(3,:));
+    ax(3) = subplot(3,1,3);plot(x,data1_left(4,:), x, data1_right(4,:));
+    linkaxes(ax,'x');
+    pause;
+    close all;
+
+    % Initialize sets that will hold data from all trials
+    left_x_set = [[];[data1_left(2,1:end), zeros(1,max_trial_size - size(data1_left,2))]];
+    right_x_set = [data1_right(2,1:end), zeros(1,max_trial_size - size(data1_right,2))];
+    left_y_set = [data1_left(3,1:end), zeros(1,max_trial_size - size(data1_left,2))];
+    right_y_set = [data1_right(3,1:end), zeros(1,max_trial_size - size(data1_right,2))];
+    left_z_set = [data1_left(4,1:end), zeros(1,max_trial_size - size(data1_left,2))];
+    right_z_set = [data1_right(4,1:end), zeros(1,max_trial_size - size(data1_right,2))];
+    
+    % Loop through each trial
+    for i = 2:1:num_files
+        % Get next data trial
+        data_left = raw_data{i,left_index};
+        data_right = raw_data{i,right_index};
         
-        %clf(figure(1)); 
+        % Plot initial trial data, other trials will be compared to this
+        % one
         figure(2)=gcf;
         clf(figure(2))
-        plot(x_set1(1,:)); 
+        plot(left_x_set(1,:));
         hold on;
-        plot(x_set2(1,:));
-        axi1 = figure(2).CurrentAxes;
-       
-        %ax(2)=subplot(3,1,2);plot(y_set(1,:));
-        %ax(3)=subplot(3,1,3);plot(z_set(1,:));
+        plot(right_x_set(1,:));
+        axis1 = figure(2).CurrentAxes;
         
-        axi1_pos = axi1.Position; % position of first axes
-        ax2 = axes('Position',axi1_pos,...
+        % Plot data of current trial with the initial
+        axis_pos = axis1.Position; % position of first axes
+        axis2 = axes('Position',axis_pos,...
         'XAxisLocation','top',...
         'YAxisLocation','right',...
         'Color','none');
         hold on;
-        plot(ax2,datal(2,:),'g');
-        plot(ax2,datar(2,:),'k');
+        plot(axis2, data_left(2,:), 'g');
+        plot(axis2, data_right(2,:), 'k');
+        % Allow axes panning and wait for user to synchronize data between
+        % different trials
         title('Pan until desired overlapping and pres ENTER')
-        xlim([0 1000])
+        xlim([0 max_trial_size])
         h=pan;
         h.ActionPreCallback = @myprecallback;
         h.ActionPostCallback = @mypostcallback;
         h.Motion = 'horizontal';
         h.Enable = 'on';
-
         pause;
+        
+        % Get data panning info
         x_limits = xlim;
 
+        % Pan new data according to x_limits
         if x_limits(1) < 0
             x_limits(1) = abs(floor(x_limits(1)));
-            datal = [zeros(4,x_limits(1)) datal(1:end,1:end)]; 
-            datar = [zeros(4,x_limits(1)) datar(1:end,1:end)];
+            data_left = [zeros(4,x_limits(1)) data_left(1:end,1:end)];
+            data_right = [zeros(4,x_limits(1)) data_right(1:end,1:end)];
         elseif x_limits(1) == 0
-                x_limits(1)=1;
-                datal = datal(1:end,ceil(x_limits(1)):end);
-                datar = datar(1:end,ceil(x_limits(1)):end);
+            x_limits(1) = 1;
+            data_left = data_left(1:end,ceil(x_limits(1)):end);
+            data_right = data_right(1:end,ceil(x_limits(1)):end);
         else
-       datal = datal(1:end,ceil(x_limits(1)):end); 
-       datar = datar(1:end,ceil(x_limits(1)):end); 
+            data_left = data_left(1:end,ceil(x_limits(1)):end);
+            data_right = data_right(1:end,ceil(x_limits(1)):end);
         end
-        x_set1=[x_set1;[datal(2,1:end),zeros(1,ub-size(datal,2))]];
-        y_set1=[y_set1;[datal(3,1:end),zeros(1,ub-size(datal,2))]];
-        z_set1=[z_set1;[datal(4,1:end),zeros(1,ub-size(datal,2))]];
-        x_set2=[x_set2;[datar(2,1:end),zeros(1,ub-size(datar,2))]];
-        y_set2=[y_set2;[datar(3,1:end),zeros(1,ub-size(datar,2))]];
-        z_set2=[z_set2;[datar(4,1:end),zeros(1,ub-size(datar,2))]];
+        
+        % Add new trial panned data to set
+        left_x_set = [left_x_set; [data_left(2,1:end), zeros(1,max_trial_size-size(data_left,2))]];
+        left_y_set = [left_y_set; [data_left(3,1:end), zeros(1,max_trial_size-size(data_left,2))]];
+        left_z_set = [left_z_set; [data_left(4,1:end), zeros(1,max_trial_size-size(data_left,2))]];
+        right_x_set = [right_x_set; [data_right(2,1:end), zeros(1,max_trial_size-size(data_right,2))]];
+        right_y_set = [right_y_set; [data_right(3,1:end), zeros(1,max_trial_size-size(data_right,2))]];
+        right_z_set = [right_z_set; [data_right(4,1:end), zeros(1,max_trial_size-size(data_right,2))]];
     end
-    %
-    for i=1:size(x_set1,1)
-    subplot(3,1,1); hold on;
-    plot(x_set1(i,:));
-    plot(x_set2(i,:));
-    subplot(3,1,2); hold on;
-    plot(y_set1(i,:));
-    plot(y_set2(i,:));
-    subplot(3,1,3); hold on;
-    plot(z_set1(i,:));
-    plot(z_set2(i,:));
+    
+    % Plot all panned trials' data together
+    for i=1:size(left_x_set,1)
+        subplot(3,1,1); hold on;
+        plot(left_x_set(i,:));
+        plot(right_x_set(i,:));
+        subplot(3,1,2); hold on;
+        plot(left_y_set(i,:));
+        plot(right_y_set(i,:));
+        subplot(3,1,3); hold on;
+        plot(left_z_set(i,:));
+        plot(right_z_set(i,:));
     end
+    % Cut data on the left and right based on user input
     title('Choose cutting LEFT and RIGHT edges')
     [cutx,~] = ginput(2);
-    x_set1 = x_set1(1:end,ceil(cutx(1)):ceil(cutx(2)));
-    y_set1 = y_set1(1:end,ceil(cutx(1)):ceil(cutx(2)));
-    z_set1 = z_set1(1:end,ceil(cutx(1)):ceil(cutx(2)));
-    x_set2 = x_set2(1:end,ceil(cutx(1)):ceil(cutx(2)));
-    y_set2 = y_set2(1:end,ceil(cutx(1)):ceil(cutx(2)));
-    z_set2 = z_set2(1:end,ceil(cutx(1)):ceil(cutx(2)));
+    left_x_set = left_x_set(1:end,ceil(cutx(1)):ceil(cutx(2)));
+    left_y_set = left_y_set(1:end,ceil(cutx(1)):ceil(cutx(2)));
+    left_z_set = left_z_set(1:end,ceil(cutx(1)):ceil(cutx(2)));
+    right_x_set = right_x_set(1:end,ceil(cutx(1)):ceil(cutx(2)));
+    right_y_set = right_y_set(1:end,ceil(cutx(1)):ceil(cutx(2)));
+    right_z_set = right_z_set(1:end,ceil(cutx(1)):ceil(cutx(2)));
   
-    processed_data.left.x = x_set1;
-    processed_data.right.x = x_set2;
-    processed_data.left.y = y_set1;
-    processed_data.right.y = y_set2;
-    processed_data.left.z = z_set1;
-    processed_data.right.z = z_set2;
-    processed_data.size = length(x_set1(1,:)); 
+    % Return cut data
+    processed_data.left.x = left_x_set;
+    processed_data.right.x = right_x_set;
+    processed_data.left.y = left_y_set;
+    processed_data.right.y = right_y_set;
+    processed_data.left.z = left_z_set;
+    processed_data.right.z = right_z_set;
+    processed_data.size = length(left_x_set(1,:)); 
     
 function myprecallback(obj,evd)
     disp('A pan is about to occur.');

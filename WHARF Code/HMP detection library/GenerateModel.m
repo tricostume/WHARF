@@ -46,7 +46,7 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel(x_set,y_set,z_set
 
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
 % ... AND CREATE THE DATASETS FOR GM-MODELING
-[gravity body] = CreateDatasets(numSamples,x_set,y_set,z_set,0);
+[gravity, body] = CreateDatasets(numSamples,x_set,y_set,z_set,0);
 
 % COMPUTE THE EXPECTED CURVE FOR EACH DATASET (GMM+GMR)
 % 1) determine the number of Gaussians to be used in the GMM

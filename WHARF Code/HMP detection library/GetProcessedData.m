@@ -1,4 +1,4 @@
-function [ x_set y_set z_set numSamples ] = GetProcessedData( modelfile,hand_index )
+function [ x_set, y_set, z_set, numSamples ] = GetProcessedData( modelfile, hand_index )
 %GETPROCESSEDDATA Summary of this function goes here
 
 % This function is used to extract the data in the matrix form from the
@@ -22,19 +22,19 @@ function [ x_set y_set z_set numSamples ] = GetProcessedData( modelfile,hand_ind
 %                  same for ALL files)
 
     %Loading the mat  file
-    prdata=matfile(modelfile);
+    prdata = matfile(modelfile);
+    processed_data = prdata.processed_data;
     %Extracting the data
-    numSamples=prdata.numSamples;
+    numSamples = processed_data.size;
     if(hand_index==1)
-       x_set=prdata.processed_data.left.x';
-       y_set=prdata.processed_data.left.y';
-       z_set=prdata.processed_data.left.z';
+       x_set = processed_data.left.x';
+       y_set = processed_data.left.y';
+       z_set = processed_data.left.z';
     elseif(hand_index==2)
-       x_set=prdata.processed_data.right.x';
-       y_set=prdata.processed_data.right.y';
-       z_set=prdata.processed_data.right.z';
+       x_set = processed_data.right.x';
+       y_set = processed_data.right.y';
+       z_set = processed_data.right.z';
     else
        disp('Invalid Hand Index');
     end
-
 end
