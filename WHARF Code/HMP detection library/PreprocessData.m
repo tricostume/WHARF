@@ -1,9 +1,35 @@
 function [ processed_data ] = PreprocessData( folder )
-%PreprocessData file loads the data received from the accelerometer and one
-%by one on a graph. Then you have to pan the graphs as requried. After that
-%you trim the data.
-% left 1 right 2
-% raw_data {trial,side}
+%PREPROCESSDATA Preprocess data to synchronize between trials
+% 
+% -------------------------------------------------------------------------
+% Author: Tiago P M da Silva (dept. DIBRIS, University of Genova, ITALY)
+%         Divya Haresh Shah (dept. DIBRIS, University of Genova, ITALY)
+%         Ernesto Denicia (dept. DIBRIS, University of Genova, ITALY)
+%
+% -------------------------------------------------------------------------
+%
+% PreprocessData, loads the synchronized data created by SyncDataWHARF and
+% allows a user to synchronize one trial with the other. It plots trials'
+% data one by one in a graph and allows panning them with respect to the
+% first trial. After all trial have been panned the user can trim the data
+% at the start and end to make all trials the same size.
+%
+% Input:
+%   folder --> name of folder where unprocessed model data is. This
+%              folder should be named: 
+%                 - '(\w+)_MODEL\\'
+%              being w+ the name of the modeled activity.
+%
+% Output:
+%   processed_data --> dataset containing a struct with six acceleration
+%                      arrays (left.x, left.y, left.z, right.x, right.y,
+%                      right.z) and the size of the model (size).
+%
+% Examples:
+%   SyncDataWHARF;
+%   folder = 'Data\MODELS\Open_Close_Curtains_MODEL\';
+%   trials_data = PreprocessData(folder);
+%
     % Constants declaration.
     left_index = 1;
     right_index = 2;
@@ -21,16 +47,16 @@ function [ processed_data ] = PreprocessData( folder )
     % Plot data from first trial
     close all
     x = 1:size(data1_left, 2);
-    ax(1) = subplot(3,1,1);plot(x,data1_left(2,:), x, data1_right(2,:)); hold on;
+    ax(1) = subplot(3,1,1); plot(x,data1_left(2,:), x, data1_right(2,:)); hold on;
     title('Check if this is your desired data');
-    ax(2) = subplot(3,1,2);plot(x,data1_left(3,:), x, data1_right(3,:));
-    ax(3) = subplot(3,1,3);plot(x,data1_left(4,:), x, data1_right(4,:));
+    ax(2) = subplot(3,1,2); plot(x,data1_left(3,:), x, data1_right(3,:));
+    ax(3) = subplot(3,1,3); plot(x,data1_left(4,:), x, data1_right(4,:));
     linkaxes(ax,'x');
     pause;
     close all;
 
     % Initialize sets that will hold data from all trials
-    left_x_set = [[];[data1_left(2,1:end), zeros(1,max_trial_size - size(data1_left,2))]];
+    left_x_set = [data1_left(2,1:end), zeros(1,max_trial_size - size(data1_left,2))];
     right_x_set = [data1_right(2,1:end), zeros(1,max_trial_size - size(data1_right,2))];
     left_y_set = [data1_left(3,1:end), zeros(1,max_trial_size - size(data1_left,2))];
     right_y_set = [data1_right(3,1:end), zeros(1,max_trial_size - size(data1_right,2))];
@@ -45,7 +71,7 @@ function [ processed_data ] = PreprocessData( folder )
         
         % Plot initial trial data, other trials will be compared to this
         % one
-        figure(2)=gcf;
+        figure(2) = gcf;
         clf(figure(2))
         plot(left_x_set(1,:));
         hold on;
@@ -128,11 +154,12 @@ function [ processed_data ] = PreprocessData( folder )
     processed_data.left.z = left_z_set;
     processed_data.right.z = right_z_set;
     processed_data.size = length(left_x_set(1,:)); 
-    
+
+% Announce that pan is in progress
 function myprecallback(obj,evd)
     disp('A pan is about to occur.');
 
-%
+% Save new limit after pan
 function mypostcallback(obj,evd)
     newLim = xlim
     disp('callback')
