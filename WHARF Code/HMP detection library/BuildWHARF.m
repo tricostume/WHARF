@@ -72,18 +72,22 @@ for i=1:size(model_names, 2)
     
     % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
     processed_data = GetProcessedData(modelfile);
+    numSamples = processed_data.size;
+    %Separating the data into different sets
     k_sets = SeparateDataInKGroups(processed_data, number_k_sets);
     
     for validation_set_index = 1:number_k_sets
+        %Getting the training and validation sets for respective k-fold
+        %cross validation
         [train_processed_data, val_processed_data] = SeparateTrainValidationSets(k_sets, validation_set_index);
         % Builds specified models for each hand
         for hand_index=1:2
             disp(hand_strings{hand_index});
             % Generate models and compute thresholds
             if hand_index==1
-                [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.left, train_processed_data.size);
+                [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.left, numSamples);
             else
-                [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.right, train_processed_data.size);
+                [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.right, numSamples);
             end
             model_threshold = ComputeThreshold(model_gP,model_gS,model_bP,model_bS,scale);
             hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);

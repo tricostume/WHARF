@@ -1,4 +1,4 @@
-function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel(x_set, y_set, z_set, numSamples)
+function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel( training_data, numSamples )
 %GENERATEMODEL Generate gravity and body model for a activity
 %
 % -------------------------------------------------------------------------
@@ -38,9 +38,7 @@ function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel(x_set, y_set, 
 %                           the 3 axes)
 %
 % Input:
-%   x_set --> vector containing x axis acceleration
-%   y_set --> vector containing y axis acceleration
-%   z_set --> vector containing z axis acceleration
+%   training_data -->  the training data set for the respective hand
 %   numSamples --> size of acceleration vectors
 % 
 % Output:
@@ -50,12 +48,15 @@ function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel(x_set, y_set, 
 %   b_sigma --> associated covariance matrices
 %
 % Example:
-%   file = 'Data\PREPROCESSED_DATA\OpenCloseCurtains_PREPROCESSED.mat';
-%   hand_index = 1; % Left hand.
-%   [ x_set, y_set, z_set, numSamples ] = GetProcessedData( file, ...
-%                                                   hand_index );
-%   [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel(x_set, ...
-%                                       y_set, z_set, numSamples);
+% validation_set_index = 1;
+% [train_processed_data, val_processed_data] = SeparateTrainValidationSets(k_sets, validation_set_index);
+% hand_index=1;
+% [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.left, numSamples);
+
+%Extracting accelerations in respective co-ordinate axes
+x_set = training_data.x;
+y_set = training_data.y;
+z_set = training_data.z;
 
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
 % ... AND CREATE THE DATASETS FOR GM-MODELING
