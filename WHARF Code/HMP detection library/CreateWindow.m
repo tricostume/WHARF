@@ -47,11 +47,10 @@ function [window, numWritten] = CreateWindow(data_sample,window,window_size,numW
 %   ** this function is part of the code of ValidateWHARF:
 %   ** do NOT call it directly!
 
-% COMPUTE THE ACTUAL WINDOW
-if(numWritten < window_size)
-    window(numWritten+1,:) = data_sample(:);
-    numWritten = numWritten+1;
-else
+    % COMPUTE THE ACTUAL WINDOW
+    if(numWritten < window_size)
+        % window(numWritten+1,:) = data_sample(:);
+        numWritten = numWritten+1;
+    end
     window = circshift(window,[-1 0]);
     window(window_size,:) = data_sample;
-end
