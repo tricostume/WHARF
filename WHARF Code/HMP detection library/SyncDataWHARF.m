@@ -37,8 +37,10 @@ subfolders = subfolders(~ismember({subfolders.name},{'.','..'}));
 
 % Builds all specified models
 for i=1:length(subfolders)
+    % Close open files to prevent MatLab instability
+    fclose all;
+    % Synchronizes and saves data in specified folder
     subfolder = [subfolders(i).name '\'];
     fprintf('Syncing %s folder...\n', subfolder);
-    % Synchronizes and saves data in specified folder
     SynchronizeData(subfolder);
 end

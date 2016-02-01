@@ -19,8 +19,11 @@
 SAVE_FOLDER = 'Data\PREPROCESSED_DATA\';
 
 % Models folders and names.
-model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap'};
-folders = {'Open_Close_Curtains_MODEL\'; 'Sweeping_MODEL\'; 'Filling_Cup_on_Tap_MODEL\'};
+model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', ...
+    'RemovingFromFridge', 'WardrobeOpening'};
+folders = {'Open_Close_Curtains_MODEL\'; 'Sweeping_MODEL\'; ...
+    'Filling_Cup_on_Tap_MODEL\'; 'Removing_from_Fridge_MODEL\'; ...
+    'Wardrobe_Opening_MODEL\'};
 
 % Preprocess each model
 for i=1:size(model_names, 2)

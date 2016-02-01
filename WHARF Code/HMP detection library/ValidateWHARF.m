@@ -65,7 +65,7 @@ folders = folders(~ismember({folders.name},{'.','..'}));
 for i=1:length(folders)
     folder = [folders(i).name '\'];
     trials_data = GetTrialsData([main_folder folder]);
-
+    keyboard
     % DEFINE CONSTANTS
     model_hands = {'left_hand', 'right_hand'};
 
@@ -97,13 +97,14 @@ for i=1:length(folders)
     files = dir([[main_folder folder], '*.mat'])';
     % Get number of data entries.
     numFiles = size(trials_data, 1);
-    for i=1:1:numFiles
+    for file_index=1:1:numFiles
         % create the log file
         res_folder = 'Data\RESULTS\';
-        resultFileName = [res_folder 'RES_' files(i).name];
+        resultFileName = [res_folder 'RES_' files(file_index).name];
+        graphFileName = [res_folder 'GRAPH_' files(file_index).name(1:end-4)];
         for hand_index=1:1:numHands
             % transform the trial into a stream of samples
-            current_data = trials_data{i,hand_index}(2:4,1:end);   % remove timestamp data
+            current_data = trials_data{file_index,hand_index}(2:4,1:end);   % remove timestamp data
             numSamples = size(current_data, 2);
             if numSamples < window_size
                 continue
@@ -134,7 +135,7 @@ for i=1:length(folders)
 
         % If number of samples in trial is smaller than window size, ignore it
         if numSamples < window_size
-            disp(['Trial ' int2str(i) ' data is smaller than one of the models, so we cant run it. Will skip it!']);
+            disp(['Trial ' int2str(file_index) ' data is smaller than one of the models, so we cant run it. Will skip it!']);
             continue
         end
 
@@ -153,8 +154,11 @@ for i=1:length(folders)
         x = window_size:1:numSamples;
         figure,
             plot(x,possibilities(window_size:end,:));
+            % title()
             h = legend(models(:).name,numModels);
             set(h,'Interpreter','none')
+            print(graphFileName, '-deps');
+            print(graphFileName, '-dpng');
         clear possibilities hand_possibilities hand_dist;
     end
 end

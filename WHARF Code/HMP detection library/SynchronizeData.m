@@ -102,7 +102,6 @@ function [ trials_data ] = SynchronizeData( subfolder )
         trials_data{i, left_watch} = trials_data{i, left_watch}(:,1:data_size);
         trials_data{i, right_watch} = trials_data{i, right_watch}(:,1:data_size);
     end
-    
     % Save data in its respective folders
     switch data_type
         case 'MODEL'

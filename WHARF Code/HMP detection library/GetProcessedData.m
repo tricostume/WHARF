@@ -1,4 +1,4 @@
-function [ x_set, y_set, z_set, numSamples ] = GetProcessedData( modelfile, hand_index )
+function [ processed_data ] = GetProcessedData( modelfile )
 %GETPROCESSEDDATA Get preprocessed data for a single activity
 % 
 % -------------------------------------------------------------------------
@@ -40,17 +40,17 @@ function [ x_set, y_set, z_set, numSamples ] = GetProcessedData( modelfile, hand
     prdata = matfile(modelfile);
     processed_data = prdata.processed_data;
     
-    %Extracting the data
-    numSamples = processed_data.size;
-    if(hand_index==1)
-       x_set = processed_data.left.x';
-       y_set = processed_data.left.y';
-       z_set = processed_data.left.z';
-    elseif(hand_index==2)
-       x_set = processed_data.right.x';
-       y_set = processed_data.right.y';
-       z_set = processed_data.right.z';
-    else
-       disp('Invalid Hand Index');
-    end
+%     %Extracting the data
+%     numSamples = processed_data.size;
+%     if(hand_index==1)
+%        x_set = processed_data.left.x';
+%        y_set = processed_data.left.y';
+%        z_set = processed_data.left.z';
+%     elseif(hand_index==2)
+%        x_set = processed_data.right.x';
+%        y_set = processed_data.right.y';
+%        z_set = processed_data.right.z';
+%     else
+%        disp('Invalid Hand Index');
+%     end
 end
