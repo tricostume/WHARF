@@ -52,7 +52,7 @@ hand_strings = {'- Building left hand model...';
                 '- Building right hand model...'};
 
 % Models to be ran
-model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap'};
+model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', 'RemovingFromFridge', 'WardrobeOpening'};
 folder = 'Data\PREPROCESSED_DATA\';
 
 % Preallocating models array struct
