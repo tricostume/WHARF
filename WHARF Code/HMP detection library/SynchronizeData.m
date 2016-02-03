@@ -21,12 +21,10 @@ function [ trials_data ] = SynchronizeData( subfolder )
 % Input:
 %   subfolder --> name of folder where unsynchronized data is. This
 %                 subfolder should be named: 
-%       - '(\d{2}\.\d{2}\.\d{2})_(\w+)_(MODEL|VALIDATION)(_TIMEDIFF)?\\'
+%       - '(\d{2}\.\d{2}\.\d{2})_(\w+)_(MODEL|VALIDATION)\\'
 %           . The date the data was taken (as yy.mm.dd)
 %           . The name of the activity
 %           . If this is a MODEL or VALIDATION data
-%           . Include _TIMEDIFF if the watches data have a delta_time 
-%             between their timestamp data
 %
 % Output:
 %   trials_data --> dataset containing a Nx2x4xM cell array.
@@ -51,20 +49,15 @@ function [ trials_data ] = SynchronizeData( subfolder )
     right_watch = 2;
     
     % Folder name regex
-    folder_pattern = '(\d{2}\.\d{2}\.\d{2})_(\w+)_(MODEL|VALIDATION)(_TIMEDIFF)?\\';
+    folder_pattern = '(\d{2}\.\d{2}\.\d{2})_(\w+)_(MODEL|VALIDATION)\\';
     tokens = regexp(subfolder, folder_pattern, 'tokens');
     % Folder name parsing
     sync_subfolder = [tokens{1}{1} '\'];
     data_name = tokens{1}{2};
     data_type = tokens{1}{3};
-    has_timediff = ~isempty(tokens{1}{4});
 
-    % If folder name include _TIMEDIFF, get delta_time for synchronization,
-    % else set it to zero
-    delta_time = 0;
-    if has_timediff
-        delta_time = FindWatchesSyncTimeDiff(['SYNC_' sync_subfolder]);
-    end
+    % Get delta_time for synchronization
+    delta_time = FindWatchesSyncTimeDiff(['SYNC_' sync_subfolder]);
     
     % Get all trials data
     [trials_data, trials_names] = ReadFiles([UNSYNCED_DATA_FOLDER subfolder]);
@@ -83,7 +76,7 @@ function [ trials_data ] = SynchronizeData( subfolder )
             real_time_diffs = time_diffs - delta_time;
             [~, index] = min(abs(real_time_diffs));
             current_time_diff = real_time_diffs(index);
-            % If time diff crossed zero, means it's close to zero 
+            % If time diff crossed zero, means it's close to zero
             if abs(current_time_diff) > abs(old_time_diff)
                 break;
             end
@@ -102,6 +95,7 @@ function [ trials_data ] = SynchronizeData( subfolder )
         trials_data{i, left_watch} = trials_data{i, left_watch}(:,1:data_size);
         trials_data{i, right_watch} = trials_data{i, right_watch}(:,1:data_size);
     end
+    
     % Save data in its respective folders
     switch data_type
         case 'MODEL'
