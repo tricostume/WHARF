@@ -46,6 +46,7 @@
 
 % CREATE THE MODELS AND ASSOCIATED THRESHOLDS
 scale = 1.5;  % experimentally set scaling factor for the threshold computation
+number_k_sets = 5;
 
 % Constants
 hand_strings = {'- Building left hand model...';

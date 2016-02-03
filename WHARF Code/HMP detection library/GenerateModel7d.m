@@ -51,8 +51,8 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel7d(folder)
 %[xr yr zr numSamplesr] = GetTrialsData(folder_right,0);
 
 
-[x_left,y_left,z_left, numSamples_left] = GetProcessedData(folder,1);
-[x_right,y_right,z_right, numSamples_right] = GetProcessedData(folder,2);
+[x_left,y_left,z_left, numSamples_left] = GetProcessedData7d(folder,1);
+[x_right,y_right,z_right, numSamples_right] = GetProcessedData7d(folder,2);
 
 
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
