@@ -66,8 +66,7 @@ for i=1:length(folders)
     folder = [folders(i).name '\'];
     trials_data = GetTrialsData([main_folder folder]);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     % DEFINE CONSTANTS
     model_hands = {'left_hand', 'right_hand'};
 
@@ -95,10 +94,7 @@ for i=1:length(folders)
     hand_possibilities = zeros(1, numModels, numHands);
     possibilities = zeros(1, numModels);
 
-=======
->>>>>>> origin/master
-=======
->>>>>>> origin/master
+
     % ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
     files = dir([[main_folder folder], '*.mat'])';
     % Get number of data entries.
