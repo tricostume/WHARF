@@ -105,67 +105,11 @@ for i=1:length(folders)
     % Get number of data entries.
     numFiles = size(trials_data, 1);
     for k=1:1:numFiles
-        % create the log file
-        res_folder = 'Data\RESULTS\';
-        resultFileName = [res_folder 'RES_' files(k).name];
-   %     for hand_index=1:1:numHands
-            % transform the trial into a stream of samples
-            current_data = trials_data{k}(2:7,1:end);   % remove timestamp data
-            numSamples = size(current_data, 2);
-            % If number of samples in trial is smaller than window size, ignore it
-            if numSamples < window_size
-                disp(['Trial ' int2str(k) ' data is smaller than one of the models, so we cant run it. Will skip it!']);
-                continue
-            end
-            % initialize the window of data to be used by the classifier
-            window = zeros(window_size,6);
-            numWritten = 0;
-            for j=1:1:numSamples
-                current_sample = current_data(:,j);
-                % update the sliding window with the current sample
-                [window, numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
-                % analysis is meaningful only when we have enough samples
-                if (numWritten >= window_size)
-                    % compute the acceleration components of the current window of samples
-                    [gravity, body] = AnalyzeActualWindow7d(window,window_size);
-                    % compute the difference between the actual data and each model
-                    for m=1:1:numModels
-                        model = models(m);
-                        dist(1, m) = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-                        dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-
-                    end
-                    % classify the current data
-                    hand_possibilities(j,:, 1) = Classify(dist(1, :),thresholds(1, :));
-                    hand_possibilities_DTW(j,:,1) = Classify(dist_DTW(1, :),thresholds(1, :));
-                else
-                    hand_possibilities(j,:, 1) = zeros(1,numModels);
-                    hand_possibilities_DTW(j,:, 1) = zeros(1,numModels);
-                end
-            end
-      %  end
-
-
-
-        % log the classification results in the log file
-        possibilities = hand_possibilities(:,:, 1);
-        possibilities_DTW = hand_possibilities_DTW(:,:,1);
-        label = num2str(possibilities(j,1));
-        for m=2:1:numModels
-            label = [label,' ',num2str(possibilities(j,m))];
-        end
-        label = [label,'\n'];
-        resultFile = fopen(resultFileName,'a');
-        fprintf(resultFile,label);
-        fclose(resultFile);
-
-        % plot the possibilities curves for the models
-        x = window_size:1:numSamples;
-        figure,
-            plot(x,possibilities(window_size:end,:));
-            plot(x,possibilities_DTW(window_size:end,:));
-            h = legend(models(:).name,numModels);
-            set(h,'Interpreter','none')
-        clear possibilities hand_possibilities hand_dist;
+        % Get current trial file name
+        file_name = files(k).name;
+        % Get single trial's data
+        single_trial_data = trials_data{k};
+        % Validate trial
+        ValidateTrial7d( models, single_trial_data, file_name, 1 );
     end
 end
