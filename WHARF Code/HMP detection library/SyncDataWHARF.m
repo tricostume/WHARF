@@ -44,3 +44,5 @@ for i=1:length(subfolders)
     fprintf('Syncing %s folder...\n', subfolder);
     SynchronizeData(subfolder);
 end
+
+fclose all;
