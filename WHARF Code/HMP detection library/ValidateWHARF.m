@@ -66,6 +66,7 @@ for i=1:length(folders)
     folder = [folders(i).name '\'];
     trials_data = GetTrialsData([main_folder folder]);
 
+<<<<<<< HEAD
     % DEFINE CONSTANTS
     model_hands = {'left_hand', 'right_hand'};
 
@@ -76,7 +77,7 @@ for i=1:length(folders)
     numHands = size(model_hands, 2);
     models_size = zeros(1, numModels);
     for m=1:1:numModels
-        % Left hand model should have same size as hight hand, so just get one
+        % Left hand model should have same size as right hand, so just get one
         % of them
         models_size(m) = size(models(m).left_hand.bP,2)+64;
     end
@@ -93,68 +94,18 @@ for i=1:length(folders)
     hand_possibilities = zeros(1, numModels, numHands);
     possibilities = zeros(1, numModels);
 
+=======
+>>>>>>> origin/master
     % ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
     files = dir([[main_folder folder], '*.mat'])';
     % Get number of data entries.
     numFiles = size(trials_data, 1);
-    for i=1:1:numFiles
-        % create the log file
-        res_folder = 'Data\RESULTS\';
-        resultFileName = [res_folder 'RES_' files(i).name];
-        for hand_index=1:1:numHands
-            % transform the trial into a stream of samples
-            current_data = trials_data{i,hand_index}(2:4,1:end);   % remove timestamp data
-            numSamples = size(current_data, 2);
-            if numSamples < window_size
-                continue
-            end
-            % initialize the window of data to be used by the classifier
-            window = zeros(window_size,3);
-            numWritten = 0;
-            for j=1:1:numSamples
-                current_sample = current_data(:,j);
-                % update the sliding window with the current sample
-                [window, numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
-                % analysis is meaningful only when we have enough samples
-                if (numWritten >= window_size)
-                    % compute the acceleration components of the current window of samples
-                    [gravity, body] = AnalyzeActualWindow(window,window_size);
-                    % compute the difference between the actual data and each model
-                    for m=1:1:numModels
-                        model = models(m).(model_hands{hand_index});
-                        hand_dist(hand_index, m) = CompareWithModels(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-                    end
-                    % classify the current data
-                    hand_possibilities(j,:, hand_index) = Classify(hand_dist(hand_index, :),thresholds(hand_index, :));
-                else
-                    hand_possibilities(j,:, hand_index) = zeros(1,numModels);
-                end
-            end
-        end
-
-        % If number of samples in trial is smaller than window size, ignore it
-        if numSamples < window_size
-            disp(['Trial ' int2str(i) ' data is smaller than one of the models, so we cant run it. Will skip it!']);
-            continue
-        end
-
-        % log the classification results in the log file
-        possibilities = hand_possibilities(:,:, 1).*hand_possibilities(:,:, 2);
-        label = num2str(possibilities(j,1));
-        for m=2:1:numModels
-            label = [label,' ',num2str(possibilities(j,m))];
-        end
-        label = [label,'\n'];
-        resultFile = fopen(resultFileName,'a');
-        fprintf(resultFile,label);
-        fclose(resultFile);
-
-        % plot the possibilities curves for the models
-        x = window_size:1:numSamples;
-        figure,
-            plot(x,possibilities(window_size:end,:));
-            h = legend(models(:).name,numModels);
-            set(h,'Interpreter','none')
-        clear possibilities hand_possibilities hand_dist;
+    for file_index=1:1:numFiles
+        % Get current trial file name
+        file_name = files(file_index).name;
+        % Get single trial's data
+        single_trial_data = {trials_data{file_index,1}; trials_data{file_index,2}};
+        % Validate trial
+        ValidateTrial( models, single_trial_data, file_name, 1 );
     end
 end
