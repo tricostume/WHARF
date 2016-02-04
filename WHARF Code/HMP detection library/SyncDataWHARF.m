@@ -14,12 +14,10 @@
 % generates time synced data with respect to the timestamps on both 
 % datasets. It goes through all the subfolders inside the 
 % UNSYNCED_DATA_FOLDER, this subfolders should be named:
-%   - '(\d{2}\.\d{2}\.\d{2})_(\w+)_(MODEL|VALIDATION)(_TIMEDIFF)?\\'
+%   - '(\d{2}\.\d{2}\.\d{2})_(\w+)_(MODEL|VALIDATION)\\'
 %     . The date the data was taken (as yy.mm.dd)
 %     . The name of the activity
 %     . If this is a MODEL or VALIDATION data
-%     . Include _TIMEDIFF if the watches data have a delta_time between
-%       their timestamp data
 % Inside each subfolder there should be a equal number of files named:
 %   - '*_Right.txt'
 %   - '*_Left.txt'

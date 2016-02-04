@@ -56,12 +56,12 @@ function [ processed_data ] = PreprocessData( folder )
     close all;
 
     % Initialize sets that will hold data from all trials
-    left_x_set = [data1_left(2,1:end), zeros(1,max_trial_size - size(data1_left,2))];
-    right_x_set = [data1_right(2,1:end), zeros(1,max_trial_size - size(data1_right,2))];
-    left_y_set = [data1_left(3,1:end), zeros(1,max_trial_size - size(data1_left,2))];
-    right_y_set = [data1_right(3,1:end), zeros(1,max_trial_size - size(data1_right,2))];
-    left_z_set = [data1_left(4,1:end), zeros(1,max_trial_size - size(data1_left,2))];
-    right_z_set = [data1_right(4,1:end), zeros(1,max_trial_size - size(data1_right,2))];
+    left_x_set = [data1_left(2,1:end), ones(1,max_trial_size - size(data1_left,2))*data1_left(2,end)];
+    right_x_set = [data1_right(2,1:end), ones(1,max_trial_size - size(data1_right,2))*data1_right(2,end)];
+    left_y_set = [data1_left(3,1:end), ones(1,max_trial_size - size(data1_left,2))*data1_left(3,end)];
+    right_y_set = [data1_right(3,1:end), ones(1,max_trial_size - size(data1_right,2))*data1_right(3,end)];
+    left_z_set = [data1_left(4,1:end), ones(1,max_trial_size - size(data1_left,2))*data1_left(4,end)];
+    right_z_set = [data1_right(4,1:end), ones(1,max_trial_size - size(data1_right,2))*data1_right(4,end)];
     
     % Loop through each trial
     for i = 2:1:num_files
@@ -104,24 +104,35 @@ function [ processed_data ] = PreprocessData( folder )
         % Pan new data according to x_limits
         if x_limits(1) < 0
             x_limits(1) = abs(floor(x_limits(1)));
-            data_left = [zeros(4,x_limits(1)) data_left(1:end,1:end)];
-            data_right = [zeros(4,x_limits(1)) data_right(1:end,1:end)];
+            % Shif data_left and data_right with pan information while
+            % filling start with continuous data equals to its first value
+            temp_left = [ones(1,x_limits(1))*data_left(1,1); ...
+                    ones(1,x_limits(1))*data_left(2,1); ...
+                    ones(1,x_limits(1))*data_left(3,1); ...
+                    ones(1,x_limits(1))*data_left(4,1)];
+            temp_right = [ones(1,x_limits(1))*data_right(1,1); ...
+                    ones(1,x_limits(1))*data_right(2,1); ...
+                    ones(1,x_limits(1))*data_right(3,1); ...
+                    ones(1,x_limits(1))*data_right(4,1)];
+            data_left = [temp_left data_left(1:end,1:end)];
+            data_right = [temp_right data_right(1:end,1:end)];
         elseif x_limits(1) == 0
             x_limits(1) = 1;
-            data_left = data_left(1:end,ceil(x_limits(1)):end);
-            data_right = data_right(1:end,ceil(x_limits(1)):end);
+            data_left = data_left(1:end, ceil(x_limits(1)):end);
+            data_right = data_right(1:end, ceil(x_limits(1)):end);
         else
             data_left = data_left(1:end,ceil(x_limits(1)):end);
             data_right = data_right(1:end,ceil(x_limits(1)):end);
         end
         
-        % Add new trial panned data to set
-        left_x_set = [left_x_set; [data_left(2,1:end), zeros(1,max_trial_size-size(data_left,2))]];
-        left_y_set = [left_y_set; [data_left(3,1:end), zeros(1,max_trial_size-size(data_left,2))]];
-        left_z_set = [left_z_set; [data_left(4,1:end), zeros(1,max_trial_size-size(data_left,2))]];
-        right_x_set = [right_x_set; [data_right(2,1:end), zeros(1,max_trial_size-size(data_right,2))]];
-        right_y_set = [right_y_set; [data_right(3,1:end), zeros(1,max_trial_size-size(data_right,2))]];
-        right_z_set = [right_z_set; [data_right(4,1:end), zeros(1,max_trial_size-size(data_right,2))]];
+        % Complete data_left and data_right to max_trial size by copying
+        % its last data value and add new trial panned data to set
+        left_x_set = [left_x_set; [data_left(2,1:end), ones(1,max_trial_size-size(data_left,2))*data_left(2,end)]];
+        left_y_set = [left_y_set; [data_left(3,1:end), ones(1,max_trial_size-size(data_left,2))*data_left(3,end)]];
+        left_z_set = [left_z_set; [data_left(4,1:end), ones(1,max_trial_size-size(data_left,2))*data_left(4,end)]];
+        right_x_set = [right_x_set; [data_right(2,1:end), ones(1,max_trial_size-size(data_right,2))*data_right(2,end)]];
+        right_y_set = [right_y_set; [data_right(3,1:end), ones(1,max_trial_size-size(data_right,2))*data_right(3,end)]];
+        right_z_set = [right_z_set; [data_right(4,1:end), ones(1,max_trial_size-size(data_right,2))*data_right(4,end)]];
     end
     
     % Plot all panned trials' data together
