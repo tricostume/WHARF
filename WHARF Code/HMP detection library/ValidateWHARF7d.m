@@ -63,6 +63,7 @@ folders = folders(~ismember({folders.name},{'.','..'}));
 
 % Builds all specified models
 for i=1:length(folders)
+    disp(['Validating folder ' num2str(i) ': ' folders(i).name ]);
     folder = [folders(i).name '\'];
     trials_data = GetTrialsData([main_folder folder]);
     % For seven dimensions data must be packed in an only structure 
@@ -110,6 +111,7 @@ for i=1:length(folders)
         % Get single trial's data
         single_trial_data = trials_data{k};
         % Validate trial
+        disp(['---Validating trial:' num2str(k) ': ' file_name(1:end-4) ' ']);
         ValidateTrial7d( models, single_trial_data, file_name, 1 );
     end
 end

@@ -1,4 +1,5 @@
 function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
+    use_DTW = 0;
 
     % Define default value for flag debugMode as false
     if nargin < 4 || isempty(debug_mode)
@@ -7,9 +8,11 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
 	% Define constants
     res_folder = 'Data\RESULTS\';
     % Set result file names
-    resultFileName = [res_folder 'RES_' files(k).name];
+    resultFileName = [res_folder 'RES_' file_name(1:end-4)];
     graph_file_name = [res_folder 'GRAPH_' file_name(1:end-4)];
+    if use_DTW == 1
     graph_file_nameDTW = [res_folder 'GRAPHDTW_' file_name(1:end-4)];
+    end
     % transform the trial into a stream of samples
     current_data = trial_data(2:7,1:end);   % remove timestamp data
     numSamples = size(current_data, 2);
@@ -45,7 +48,9 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
     
     % initialize the results arrays
     dist = zeros(1, numModels);
+    if use_DTW == 1
     dist_DTW = zeros(1, numModels);
+    end
     hand_possibilities = zeros(1, numModels, 1);
     probabilities = zeros(1, numModels);
     
@@ -66,24 +71,34 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
                 model = models(m);
                 if numWritten > models_size(m)
                     [dist(1, m),probabilities(1,m)] = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-                     dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-                       % Logging distances
+                    if use_DTW == 1
+                    dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
+                    end   
+                    % Logging distances
                        log_dist(j,m) = dist(1,m);
+                       if use_DTW == 1
                        log_dist_DTW(j,m) = dist_DTW(1,m);
+                       end
                     else
                         dist(1, m) = inf;
+                        if use_DTW == 1
                         dist_DTW(1,m) = inf;
+                        end
                         probabilities(1,m) = 0;
                 end    
             end
             % classify the current data
             hand_possibilities(j,:, 1) = Classify(dist(1, :),thresholds(1, :));
+            if use_DTW == 1
             hand_possibilities_DTW(j,:,1) = Classify(dist_DTW(1, :),thresholds(1, :));
+            end
             hand_probabilities(j,:,1) = probabilities;
 
         else
             hand_possibilities(j,:, 1) = zeros(1,numModels);
+            if use_DTW == 1
             hand_possibilities_DTW(j,:, 1) = zeros(1,numModels);
+            end
             hand_probabilities(j,:,1) = zeros(1,numModels);
         end
     end
@@ -93,16 +108,16 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
 
         % log the classification results in the log file
          possibilities = hand_possibilities(:,:, 1);
+         if use_DTW == 1
          possibilities_DTW = hand_possibilities_DTW(:,:,1);
+         end
          final_probabilities =  hand_probabilities(:,:, 1);
-%         label = num2str(possibilities(j,1));
-%         for m=2:1:numModels
-%             label = [label,' ',num2str(possibilities(j,m))];
-%         end
-%         label = [label,'\n'];
-%         resultFile = fopen(resultFileName,'a');
-%         fprintf(resultFile,label);
-%         fclose(resultFile);
+
+        save(resultFileName, ...
+        'possibilities', ...
+        'log_dist', ...
+        'final_probabilities', ...
+        '-v7.3');
 
         % plot the possibilities curves for the models
         x = min_window_size:1:numSamples;
@@ -116,16 +131,17 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
             set(h1,'Interpreter','none')
             print(graph_file_name, '-deps');
             print(graph_file_name, '-dpng');
-    if debug_mode
-        h2 = figure; set(h2,'Visible', 'on');
-    else
-        h2 = figure; set(h2,'Visible', 'off');
-    end
-            plot(x,possibilities_DTW(min_window_size:end,:));
-            h2 = legend(models(:).name,numModels);
-            set(h2,'Interpreter','none')
-            print(graph_file_nameDTW, '-deps');
-            print(graph_file_nameDTW, '-dpng');
-            
+    if use_DTW == 1
+        if debug_mode
+            h2 = figure; set(h2,'Visible', 'on');
+        else
+            h2 = figure; set(h2,'Visible', 'off');
+        end
+                plot(x,possibilities_DTW(min_window_size:end,:));
+                h2 = legend(models(:).name,numModels);
+                set(h2,'Interpreter','none')
+                print(graph_file_nameDTW, '-deps');
+                print(graph_file_nameDTW, '-dpng');
+    end      
         clear possibilities hand_possibilities hand_dist;
 end

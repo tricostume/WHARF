@@ -10,6 +10,7 @@ function [norm,w,k,Dist,D]=dtwNEW(t,r,sigma)
 %r is the vector you are testing
 [rows,N]=size(t);
 [rows,M]=size(r);
+%[N,M] ---> model vector, to test vector
 for n=1:N
 	for m=1:M
         % Euclidean point-to-point distance: d(n,m)=(t(n)-r(m))^2;
@@ -32,12 +33,15 @@ for n=2:N
 	end
 end
 
-Dist=D(N,M);
+Dist=D(N,M); % Minimum accumulated distance (forward recursion)
 n=N;
 m=M;
 k=1;
 w=[];
+
+% Backward recursion, choose the 
 w(1,:)=[N,M];
+
 while ((n+m)~=2)
 	if (n-1)==0
         m=m-1;
