@@ -118,6 +118,7 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     save(result_file_name, ...
         'possibilities', ...
         'hand_possibilities', ...
+        'probabilities', ...
         'hand_probabilities', ...
         '-v7.3');
 %         'hand_possibilities_DTW', ...
@@ -129,8 +130,6 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
 %         min_window_size, num_samples, numModels, debug_mode);
     PlotAndPrint(graph_file_name_prob, models, probabilities, ...
         min_window_size, num_samples, numModels, debug_mode);
-    
-    keyboard
 
     clear possibilities hand_possibilities hand_dist;
 end
@@ -139,20 +138,17 @@ function [] = PlotAndPrint(graph_file_name, models, plotted_values, min_window_s
     % plot the possibilities curves for the models
     x = min_window_size:1:num_samples;
     
-    keyboard
-    h = figure; 
+    fig = figure; 
     if debug_mode
-        set(h,'Visible', 'on');
+        set(fig,'Visible', 'on');
     else
-        set(h,'Visible', 'off');
+        set(fig,'Visible', 'off');
     end
     
     plot(x, plotted_values(min_window_size:end,:));
     % title()
     h = legend(models(:).name, numModels);
-    set(h,'Interpreter','none')
-    print(h, graph_file_name, '-deps');
-    print(h, graph_file_name, '-dpng');
-    
-    keyboard
+    set(h,'Interpreter','none');
+    print(fig, graph_file_name, '-deps');
+    print(fig, graph_file_name, '-dpng');
 end

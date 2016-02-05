@@ -53,14 +53,18 @@
 hand_strings = {'- Building left hand model...';
                 '- Building right hand model...'};
 scale = 1.5;  % experimentally set scaling factor for the threshold computation
+number_k_sets = 5;
 
 % Models to be ran
 model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', ...
     'RemovingFromFridge', 'WardrobeOpening'};
 folder = 'Data\PREPROCESSED_DATA\';
+unprocessed_model_folder_names = {'Open_Close_Curtains_MODEL\', 'Sweeping_MODEL\', 'Filling_Cup_on_Tap_MODEL\', ...
+    'Removing_from_Fridge_MODEL\', 'Wardrobe_Opening_MODEL\'};
+unprocessed_data_folder = 'Data\MODELS\';
 
 % Preallocating models array struct
-models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', []), size(model_names, 2), 1 );
+models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', []), size(model_names, 2), number_k_sets );
 
 % Builds all specified models
 for i=1:size(model_names, 2)
@@ -72,34 +76,53 @@ for i=1:size(model_names, 2)
     % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
     processed_data = GetProcessedData(modelfile);
     numSamples = processed_data.size;
+    %Separating the data into different sets
+    [k_sets, k_sets_indexes] = SeparateDataInKGroups(processed_data, number_k_sets);
     
-    % Transpose processed data
-    processed_data.left.x = processed_data.left.x';
-    processed_data.left.y = processed_data.left.y';
-    processed_data.left.z = processed_data.left.z';
-    processed_data.right.x = processed_data.right.x';
-    processed_data.right.y = processed_data.right.y';
-    processed_data.right.z = processed_data.right.z';
-    
-    % Builds specified models for each hand
-    for hand_index=1:2
-        disp(hand_strings{hand_index});
-        % Generate models and compute thresholds
-        if hand_index==1
-            [model_gP, model_gS, model_bP, model_bS] = GenerateModel(processed_data.left, numSamples);
-        else
-            [model_gP, model_gS, model_bP, model_bS] = GenerateModel(processed_data.right, numSamples);
-        end
-        model_threshold = ComputeThreshold(model_gP,model_gS,model_bP,model_bS,scale);
-        hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
-        % Save hand model data into model struct
-        if hand_index==1
-            models(i).left_hand = hand_model;
-        else
-            models(i).right_hand = hand_model;
+    for validation_set_index = 1:number_k_sets
+        %Getting the training and validation sets for respective k-fold
+        %cross validation
+        [train_processed_data, val_processed_data] = SeparateTrainValidationSets(k_sets, validation_set_index);
+        % Builds specified models for each hand
+        for hand_index=1:2
+            disp(hand_strings{hand_index});
+            % Generate models and compute thresholds
+            if hand_index==1
+                [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.left, numSamples);
+            else
+                [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.right, numSamples);
+            end
+            model_threshold = ComputeThreshold(model_gP,model_gS,model_bP,model_bS,scale);
+            hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
+            % Save hand model data into model struct
+            if hand_index==1
+                models(i, validation_set_index).left_hand = hand_model;
+            else
+                models(i, validation_set_index).right_hand = hand_model;
+            end
+            
+            clear model_gP model_gS model_bP model_bS model_threshold
         end
 
-        clear model_gP model_gS model_bP model_bS model_threshold
+        % Call validation for k groups
+        temp_model = [models(i, validation_set_index)];
+
+        val_folder = unprocessed_model_folder_names{i};
+        val_trials_data = GetTrialsData([unprocessed_data_folder val_folder]);
+
+        for val_file_index = k_sets_indexes(validation_set_index,:)
+            validation_file_name = ['K_GROUPS_' model_names{i} ...
+                                    '__' int2str(validation_set_index) ...
+                                    '__' int2str(val_file_index) '.png'];
+            validation_data = cell(2,1);
+            single_val_trial_data = {val_trials_data{val_file_index,1}; ...
+                                     val_trials_data{val_file_index,2}};
+            ValidateTrial( temp_model, single_val_trial_data, validation_file_name, 0 );
+        end
+        
+        clear temp_model val_folder val_trials_data single_val_trial_data validation_file_name val_file_index
+        close all;
+        fclose all;
     end
 end
 clear hand_strings hand_folders model_names folders
