@@ -1,4 +1,4 @@
-function ovDistance = CompareWithModels7d(gravity,body,MODELgP,MODELgS,MODELbP,MODELbS)
+function [ovDistance, probabilities_final] = CompareWithModels7d(gravity,body,MODELgP,MODELgS,MODELbP,MODELbS)
 % function ovDistance = CompareWithModels(gravity,body,MODELgP,MODELgS,MODELbP,MODELbS)
 %
 % -------------------------------------------------------------------------
@@ -58,6 +58,13 @@ for i=1:1:numPoints
     distance(i,2) = (transpose(body(:,x)-MODELbP(2:7,find(time==x))))*...
                     inv(MODELbS(:,:,find(time==x)))*(body(:,i)-...
                     MODELbP(2:7,find(time==x)));
+    % Compute punctual probabilities
+    probabilities_gravity(i,1) = mvnpdf(gravity(:,x)',MODELgP(2:7,find(time==x))',MODELgS(:,:,find(time==x)));
+    probabilities_body(i,1) = mvnpdf(body(:,x)',MODELbP(2:7,find(time==x))',MODELbS(:,:,find(time==x)));
 end
 % compute the overall distance as the mean of the features distances
+% Notice: Might not be fully correct as mean value of joint probabilities
+% per sample is taken.
+
 ovDistance = mean(mean(distance));
+probabilities_final = mean(probabilities_gravity.*probabilities_body);

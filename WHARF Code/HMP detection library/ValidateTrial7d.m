@@ -45,33 +45,46 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
     
     % initialize the results arrays
     dist = zeros(1, numModels);
+    dist_DTW = zeros(1, numModels);
     hand_possibilities = zeros(1, numModels, 1);
-    possibilities = zeros(1, numModels);
+    probabilities = zeros(1, numModels);
     
     % initialize the window of data to be used by the classifier
     window = zeros(window_size,6);
     numWritten = 0;
+
     for j=1:1:numSamples
         current_sample = current_data(:,j);
         % update the sliding window with the current sample
         [window, numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
         % analysis is meaningful only when we have enough samples
-        if (numWritten >= window_size)
+        if (numWritten >= min_window_size)
             % compute the acceleration components of the current window of samples
             [gravity, body] = AnalyzeActualWindow7d(window,window_size);
             % compute the difference between the actual data and each model
             for m=1:1:numModels
                 model = models(m);
-                dist(1, m) = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-                dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-
+                if numWritten > models_size(m)
+                    [dist(1, m),probabilities(1,m)] = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
+                     dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
+                       % Logging distances
+                       log_dist(j,m) = dist(1,m);
+                       log_dist_DTW(j,m) = dist_DTW(1,m);
+                    else
+                        dist(1, m) = inf;
+                        dist_DTW(1,m) = inf;
+                        probabilities(1,m) = 0;
+                end    
             end
             % classify the current data
             hand_possibilities(j,:, 1) = Classify(dist(1, :),thresholds(1, :));
             hand_possibilities_DTW(j,:,1) = Classify(dist_DTW(1, :),thresholds(1, :));
+            hand_probabilities(j,:,1) = probabilities;
+
         else
             hand_possibilities(j,:, 1) = zeros(1,numModels);
             hand_possibilities_DTW(j,:, 1) = zeros(1,numModels);
+            hand_probabilities(j,:,1) = zeros(1,numModels);
         end
     end
       %  end
@@ -81,6 +94,7 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         % log the classification results in the log file
          possibilities = hand_possibilities(:,:, 1);
          possibilities_DTW = hand_possibilities_DTW(:,:,1);
+         final_probabilities =  hand_probabilities(:,:, 1);
 %         label = num2str(possibilities(j,1));
 %         for m=2:1:numModels
 %             label = [label,' ',num2str(possibilities(j,m))];

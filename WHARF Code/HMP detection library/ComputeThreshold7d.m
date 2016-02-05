@@ -56,14 +56,14 @@ len = length(far_G);
 for i=1:1:len
     for j=1:1:6
         if (far_G(j,i) > 0)
-            far_G(j,i) = far_G(j,i) + factor.*MODELgS(j,j,i);
+            far_G(j,i) = far_G(j,i) + factor.*sqrt(MODELgS(j,j,i));
         else
-            far_G(j,i) = far_G(j,i) - factor.*MODELgS(j,j,i);
+            far_G(j,i) = far_G(j,i) - factor.*sqrt(MODELgS(j,j,i));
         end
         if (far_B(j,i) > 0)
-            far_B(j,i) = far_B(j,i) + factor.*MODELbS(j,j,i);
+            far_B(j,i) = far_B(j,i) + factor.*sqrt(MODELbS(j,j,i));
         else
-            far_B(j,i) = far_B(j,i) - factor.*MODELbS(j,j,i);
+            far_B(j,i) = far_B(j,i) - factor.*sqrt(MODELbS(j,j,i));
         end
     end
 end
