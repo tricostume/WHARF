@@ -46,9 +46,8 @@ function ovDistance = CompareWithModels_DTW(gravity,body,MODELgP,MODELgS,MODELbP
 
 % COMPUTE MAHALANOBIS DISTANCE BETWEEN MODEL FEATURES AND WINDOW FEATURES
 
-i = 1:1:6;
-reference_G(i,:) = MODELgP(i+1,:);
-reference_B(i,:) = MODELbP(i+1,:);
+reference_G = MODELgP(2:end,:);
+reference_B = MODELbP(2:end,:);
 [normalized_distance(1) pathG norm_factorG] = dtwNEW(gravity',reference_G,MODELgS);
 [normalized_distance(2) pathB norm_factorB] = dtwNEW(body',reference_B,MODELbS);
 % compute the overall distance as the mean of the features distances
