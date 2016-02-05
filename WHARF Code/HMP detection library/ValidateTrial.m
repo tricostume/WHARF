@@ -13,7 +13,9 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     
     % Set result file names
     result_file_name = [res_folder 'RES_' file_name(1:end-4)];
-    graph_file_name = [res_folder 'GRAPH_' file_name(1:end-4)];
+    graph_file_name = [res_folder 'GRAPH_POSS_NORM__' file_name(1:end-4)];
+    graph_file_name_DTW = [res_folder 'GRAPH_POSS_DTW__' file_name(1:end-4)];
+    graph_file_name_prob = [res_folder 'GRAPH_PROB__' file_name(1:end-4)];
     
     % DEFINE THE VALIDATION PARAMETERS
     % compute the size of the sliding window
@@ -48,8 +50,11 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     
     % initialize the results arrays
     hand_dist = zeros(numHands, numModels);
-    hand_dist_DTW = zeros(numHands, numModels);
+%     hand_dist_DTW = zeros(numHands, numModels);
+    temp_probabilities = zeros(1, numModels);
     hand_possibilities = zeros(num_samples, numModels, numHands);
+%     hand_possibilities_DTW = zeros(num_samples, numModels, numHands);
+    hand_probabilities = zeros(num_samples, numModels, numHands);
     
     for hand_index=1:1:numHands
         % transform the trial into a stream of samples
@@ -71,51 +76,83 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
                     % If current window size is bigger than model compute
                     % distance, else set distance to infinite so prob is 0
                     if numWritten > models_size(m)
-                        hand_dist(hand_index, m) = CompareWithModels( ...
+                        [hand_dist(hand_index, m), temp_probabilities(m)] = ...
+                                    CompareWithModels( ...
                                         gravity(end-models_size(m)+1:end-64,:), ...
                                         body(end-models_size(m)+1:end-64,:), ...
                                         model.gP, model.gS, ...
                                         model.bP, model.bS);
-                        hand_dist_DTW(hand_index, m) = CompareWithModels_DTW( ...
-                                        gravity(end-models_size(m)+1:end-64,:), ...
-                                        body(end-models_size(m)+1:end-64,:), ...
-                                        model.gP, model.gS, ...
-                                        model.bP, model.bS);
+%                         hand_dist_DTW(hand_index, m) = CompareWithModels_DTW( ...
+%                                         gravity(end-models_size(m)+1:end-64,:), ...
+%                                         body(end-models_size(m)+1:end-64,:), ...
+%                                         model.gP, model.gS, ...
+%                                         model.bP, model.bS);
                     else
                         hand_dist(hand_index, m) = inf;
+%                         hand_dist_DTW(hand_index, m) = inf;
+                        temp_probabilities(m) = inf;
                     end
                 end
-                % classify the current data
+                % Classify the current data
                 hand_possibilities(j,:, hand_index) = Classify(hand_dist(hand_index, :),thresholds(hand_index, :));
+%                 hand_possibilities_DTW(j,:, hand_index) = Classify(hand_dist_DTW(hand_index, :),thresholds(hand_index, :));
+                hand_probabilities(j,:, hand_index) = temp_probabilities;
             else
                 hand_possibilities(j,:, hand_index) = zeros(1,numModels);
+%                 hand_possibilities_DTW(j,:, hand_index) = zeros(1,numModels);
+                hand_probabilities(j,:, hand_index) = zeros(1,numModels);
+            end
+            
+            if mod(j, 20) == 0
+                disp(['Trial ' file_name(1:end-4) ': Running hand ' int2str(hand_index) ' trial number ' int2str(j) ' of ' int2str(num_samples)]);
             end
         end
     end
 
     % Get the full probability for both hands uncorrelated model
-    possibilities = hand_possibilities(:,:, 1).*hand_possibilities(:,:, 2);
+    possibilities = hand_possibilities(:,:, 1) .* hand_possibilities(:,:, 2);
+%     possibilities_DTW = hand_possibilities_DTW(:,:, 1) .* hand_possibilities_DTW(:,:, 2);
+    probabilities = hand_probabilities(:,:, 1) .* hand_probabilities(:,:, 2);
     
+    % Save the validation data
     save(result_file_name, ...
         'possibilities', ...
         'hand_possibilities', ...
-        'hand_dist', ...
-        'hand_dist_DTW', ...
+        'hand_probabilities', ...
         '-v7.3');
+%         'hand_possibilities_DTW', ...
 
-    % plot the possibilities curves for the models
-    x = min_window_size:1:num_samples;
-    if debug_mode
-        h = figure; set(h,'Visible', 'on');
-    else
-        h = figure; set(h,'Visible', 'off');
-    end
-        plot(x,possibilities(min_window_size:end,:));
-        % title()
-        h = legend(models(:).name,numModels);
-        set(h,'Interpreter','none')
-        print(graph_file_name, '-deps');
-        print(graph_file_name, '-dpng');
+    % Plot the possibilities and probabilities curves for the models
+    PlotAndPrint(graph_file_name, models, possibilities, ...
+        min_window_size, num_samples, numModels, debug_mode);
+%     PlotAndPrint(graph_file_name_DTW, models, possibilities_DTW, ...
+%         min_window_size, num_samples, numModels, debug_mode);
+    PlotAndPrint(graph_file_name_prob, models, probabilities, ...
+        min_window_size, num_samples, numModels, debug_mode);
+    
+    keyboard
+
     clear possibilities hand_possibilities hand_dist;
 end
 
+function [] = PlotAndPrint(graph_file_name, models, plotted_values, min_window_size, num_samples, numModels, debug_mode)
+    % plot the possibilities curves for the models
+    x = min_window_size:1:num_samples;
+    
+    keyboard
+    h = figure; 
+    if debug_mode
+        set(h,'Visible', 'on');
+    else
+        set(h,'Visible', 'off');
+    end
+    
+    plot(x, plotted_values(min_window_size:end,:));
+    % title()
+    h = legend(models(:).name, numModels);
+    set(h,'Interpreter','none')
+    print(h, graph_file_name, '-deps');
+    print(h, graph_file_name, '-dpng');
+    
+    keyboard
+end

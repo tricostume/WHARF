@@ -1,4 +1,4 @@
-function ovDistance = CompareWithModels(gravity,body,MODELgP,MODELgS,MODELbP,MODELbS)
+function [ovDistance, probabilities] = CompareWithModels(gravity,body,MODELgP,MODELgS,MODELbP,MODELbS)
 % function ovDistance = CompareWithModels(gravity,body,MODELgP,MODELgS,MODELbP,MODELbS)
 %
 % -------------------------------------------------------------------------
@@ -50,10 +50,43 @@ gravity = gravity';
 body = body';
 time = MODELgP(1,:);
 distance = zeros(numPoints,2);
+
+probabilities_gravity = zeros(numPoints, 1);
+probabilities_body = zeros(numPoints, 1);
+
 for i=1:1:numPoints
     x = time(i);
-    distance(i,1) = (transpose(gravity(:,x)-MODELgP(2:4,find(time==x))))*inv(MODELgS(:,:,find(time==x)))*(gravity(:,i)-MODELgP(2:4,find(time==x)));
-    distance(i,2) = (transpose(body(:,x)-MODELbP(2:4,find(time==x))))*inv(MODELbS(:,:,find(time==x)))*(body(:,i)-MODELbP(2:4,find(time==x)));
+    distance(i,1) = (transpose(gravity(:,x)-MODELgP(2:end,find(time==x))))*inv(MODELgS(:,:,find(time==x)))*(gravity(:,i)-MODELgP(2:end,find(time==x)));
+    distance(i,2) = (transpose(body(:,x)-MODELbP(2:end,find(time==x))))*inv(MODELbS(:,:,find(time==x)))*(body(:,i)-MODELbP(2:end,find(time==x)));
+    
+    % Compute punctual probabilities
+    try
+        probabilities_gravity(i) = mvnpdf(gravity(:,x)',MODELgP(2:end,find(time==x))',MODELgS(:,:,find(time==x)));
+        probabilities_body(i) = mvnpdf(body(:,x)',MODELbP(2:end,find(time==x))',MODELbS(:,:,find(time==x)));
+    catch
+        % Try to eliminate numerical problems by adding a really small
+        % value to sigma
+        bigger_g_sigma = MODELgS(:,:,find(time==x)) + 5E-3.*diag(ones(3,1));
+        bigger_b_sigma = MODELbS(:,:,find(time==x)) + 5E-3.*diag(ones(3,1));
+        try
+            probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
+            probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
+        catch
+            % Try to eliminate numerical problems by adding a really small
+            % value to sigma
+            bigger_g_sigma = MODELgS(:,:,find(time==x)) + 2E-2.*diag(ones(3,1));
+            bigger_b_sigma = MODELbS(:,:,find(time==x)) + 2E-2.*diag(ones(3,1));
+            try
+                probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
+                probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
+            catch
+                keyboard
+            end
+        end
+    end
 end
-% compute the overall distance as the mean of the features distances
+
+% Notice: Might not be fully correct as mean value of joint probabilities
+% per sample is taken.
 ovDistance = mean(mean(distance));
+probabilities = mean(probabilities_gravity.*probabilities_body);
