@@ -67,4 +67,5 @@ end
 % per sample is taken.
 
 ovDistance = mean(mean(distance));
-probabilities_final = mean(probabilities_gravity.*probabilities_body);
+% probabilities_final = mean(probabilities_gravity.*probabilities_body);
+probabilities_final = mean(mean([probabilities_gravity,probabilities_body]));

@@ -13,6 +13,8 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
     if use_DTW == 1
     graph_file_nameDTW = [res_folder 'GRAPHDTW_' file_name(1:end-4)];
     end
+    graph_file_name_prob = [res_folder 'GRAPH_PROB__' file_name(1:end-4)];
+
     % transform the trial into a stream of samples
     current_data = trial_data(2:7,1:end);   % remove timestamp data
     numSamples = size(current_data, 2);
@@ -70,7 +72,16 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
             for m=1:1:numModels
                 model = models(m);
                 if numWritten > models_size(m)
-                    [dist(1, m),probabilities(1,m)] = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
+                    %[dist(1, m),probabilities(1,m)] = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
+                    [dist(1, m), probabilities(1,m)] = ...
+                                    CompareWithModels7d( ...
+                                        gravity(end-models_size(m)+1:end-64,:), ...
+                                        body(end-models_size(m)+1:end-64,:), ...
+                                        model.gP, model.gS, ...
+                                        model.bP, model.bS);
+                    
+                    
+                    
                     if use_DTW == 1
                     dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
                     end   
@@ -101,6 +112,9 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
             end
             hand_probabilities(j,:,1) = zeros(1,numModels);
         end
+        if mod(j, 50) == 0
+           disp(['------- ' file_name(1:end-4) ' Completed: ' int2str(j) '/ ' int2str(num_samples)]);
+        end
     end
       %  end
 
@@ -112,36 +126,66 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
          possibilities_DTW = hand_possibilities_DTW(:,:,1);
          end
          final_probabilities =  hand_probabilities(:,:, 1);
-
         save(resultFileName, ...
         'possibilities', ...
         'log_dist', ...
         'final_probabilities', ...
         '-v7.3');
 
-        % plot the possibilities curves for the models
-        x = min_window_size:1:numSamples;
-    if debug_mode
-        h1 = figure; set(h1,'Visible', 'on');
-    else
-        h1 = figure; set(h1,'Visible', 'off');
-    end
-            plot(x,possibilities(min_window_size:end,:));
-            h1 = legend(models(:).name,numModels);
-            set(h1,'Interpreter','none')
-            print(graph_file_name, '-deps');
-            print(graph_file_name, '-dpng');
-    if use_DTW == 1
-        if debug_mode
-            h2 = figure; set(h2,'Visible', 'on');
-        else
-            h2 = figure; set(h2,'Visible', 'off');
-        end
-                plot(x,possibilities_DTW(min_window_size:end,:));
-                h2 = legend(models(:).name,numModels);
-                set(h2,'Interpreter','none')
-                print(graph_file_nameDTW, '-deps');
-                print(graph_file_nameDTW, '-dpng');
-    end      
+    % Plot the possibilities and probabilities curves for the models
+    PlotAndPrint(graph_file_name, models, possibilities, ...
+        min_window_size, num_samples, numModels, debug_mode);
+%     PlotAndPrint(graph_file_name_DTW, models, possibilities_DTW, ...
+%         min_window_size, num_samples, numModels, debug_mode);
+    PlotAndPrint(graph_file_name_prob, models, final_probabilities, ...
+        min_window_size, num_samples, numModels, debug_mode);
+    
+    
+    
+    
+%         % plot the possibilities curves for the models
+%         x = min_window_size:1:numSamples;
+%     if debug_mode
+%         h1 = figure; set(h1,'Visible', 'on');
+%     else
+%         h1 = figure; set(h1,'Visible', 'off');
+%     end
+%             plot(x,final_probabilities(min_window_size:end,:));
+%             h1 = legend(models(:).name,numModels);
+%             set(h1,'Interpreter','none')
+%             print(graph_file_name, '-deps');
+%             print(graph_file_name, '-dpng');
+%     if use_DTW == 1
+%         if debug_mode
+%             h2 = figure; set(h2,'Visible', 'on');
+%         else
+%             h2 = figure; set(h2,'Visible', 'off');
+%         end
+%                 plot(x,possibilities_DTW(min_window_size:end,:));
+%                 h2 = legend(models(:).name,numModels);
+%                 set(h2,'Interpreter','none')
+%                 print(graph_file_nameDTW, '-deps');
+%                 print(graph_file_nameDTW, '-dpng');
+%     end      
         clear possibilities hand_possibilities hand_dist;
+end
+
+function [] = PlotAndPrint(graph_file_name, models, plotted_values, min_window_size, num_samples, numModels, debug_mode)
+    % plot the possibilities curves for the models
+    x = min_window_size:1:num_samples;
+    
+    fig = figure; 
+    if debug_mode
+        set(fig,'Visible', 'on');
+    else
+        set(fig,'Visible', 'off');
+    end
+    
+    plot(x, plotted_values(min_window_size:end,:));
+    title(graph_file_name)
+    % title()
+    h = legend(models(:).name, numModels);
+    set(h,'Interpreter','none');
+    print(fig, graph_file_name, '-deps');
+    print(fig, graph_file_name, '-dpng');
 end

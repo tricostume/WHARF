@@ -106,12 +106,13 @@ for i=1:length(folders)
     % Get number of data entries.
     numFiles = size(trials_data, 1);
     for k=1:1:numFiles
+        disp(['-------------------Trial ' int2str(k) '/' int2str(numFiles) '-------------------']);
         % Get current trial file name
         file_name = files(k).name;
         % Get single trial's data
         single_trial_data = trials_data{k};
         % Validate trial
-        disp(['---Validating trial:' num2str(k) ': ' file_name(1:end-4) ' ']);
+        %disp(['---Validating trial:' num2str(k) ': ' file_name(1:end-4) ' ']);
         ValidateTrial7d( models, single_trial_data, file_name, 1 );
     end
 end
