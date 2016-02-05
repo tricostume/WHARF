@@ -1,4 +1,4 @@
-function [ k_sets ] = SeparateDataInKGroups( processed_data, number_k_sets )
+function [ k_sets, k_sets_indexes ] = SeparateDataInKGroups( processed_data, number_k_sets )
 %%SEPARATEDATAINKGROUPS Separates the preprocessed data for a single
 %%activity, into 'k' different sets for k-fold cross validation.
 % 
@@ -29,24 +29,26 @@ function [ k_sets ] = SeparateDataInKGroups( processed_data, number_k_sets )
 %   processed_data = GetProcessedData(modelfile);
 %    k_sets = SeparateDataInKGroups(processed_data, number_k_sets);
 
-%Constants declaration
-numTrials = size(processed_data.left.x,1);
-k_set_trials = floor(numTrials/number_k_sets);
-count=0;
+    %Constants declaration
+    numTrials = size(processed_data.left.x,1);
+    k_set_trials = floor(numTrials/number_k_sets);
 
-% k_sets = repmat(processed_data, k, 1);
+    % k_sets = repmat(processed_data, k, 1);
+    k_sets_indexes = zeros(number_k_sets, k_set_trials);
 
-%Sorting of the data into sets
-for k = 1:number_k_sets
-            initial = 1 + k_set_trials*(k-1);
-            final = k_set_trials*(k);
-            k_sets(k).left.x = processed_data.left.x(initial:final,1:end)';
-            k_sets(k).left.y = processed_data.left.y(initial:final,1:end)';
-            k_sets(k).left.z = processed_data.left.z(initial:final,1:end)';
-            k_sets(k).right.x = processed_data.right.x(initial:final,1:end)';
-            k_sets(k).right.y = processed_data.right.y(initial:final,1:end)';
-            k_sets(k).right.z = processed_data.right.z(initial:final,1:end)';
-end
+    %Sorting of the data into sets
+    for k = 1:number_k_sets
+                initial = 1 + k_set_trials*(k-1);
+                final = k_set_trials*(k);
+                k_sets(k).left.x = processed_data.left.x(initial:final,1:end)';
+                k_sets(k).left.y = processed_data.left.y(initial:final,1:end)';
+                k_sets(k).left.z = processed_data.left.z(initial:final,1:end)';
+                k_sets(k).right.x = processed_data.right.x(initial:final,1:end)';
+                k_sets(k).right.y = processed_data.right.y(initial:final,1:end)';
+                k_sets(k).right.z = processed_data.right.z(initial:final,1:end)';
+
+                k_sets_indexes(k,:) = initial:final;
+    end
 
 end
 

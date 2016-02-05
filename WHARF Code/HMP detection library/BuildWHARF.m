@@ -59,6 +59,9 @@ number_k_sets = 5;
 model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', ...
     'RemovingFromFridge', 'WardrobeOpening'};
 folder = 'Data\PREPROCESSED_DATA\';
+unprocessed_model_folder_names = {'Open_Close_Curtains_MODEL\', 'Sweeping_MODEL\', 'Filling_Cup_on_Tap_MODEL\', ...
+    'Removing_from_Fridge_MODEL\', 'Wardrobe_Opening_MODEL\'};
+unprocessed_data_folder = 'Data\MODELS\';
 
 % Preallocating models array struct
 models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', []), size(model_names, 2), number_k_sets );
@@ -74,7 +77,7 @@ for i=1:size(model_names, 2)
     processed_data = GetProcessedData(modelfile);
     numSamples = processed_data.size;
     %Separating the data into different sets
-    k_sets = SeparateDataInKGroups(processed_data, number_k_sets);
+    [k_sets, k_sets_indexes] = SeparateDataInKGroups(processed_data, number_k_sets);
     
     for validation_set_index = 1:number_k_sets
         %Getting the training and validation sets for respective k-fold
@@ -97,10 +100,29 @@ for i=1:size(model_names, 2)
             else
                 models(i, validation_set_index).right_hand = hand_model;
             end
-
+            
             clear model_gP model_gS model_bP model_bS model_threshold
         end
-        % ToDo: Call Validation
+
+        % Call validation for k groups
+        temp_model = [models(i, validation_set_index)];
+
+        val_folder = unprocessed_model_folder_names{i};
+        val_trials_data = GetTrialsData([unprocessed_data_folder val_folder]);
+
+        for val_file_index = k_sets_indexes(validation_set_index,:)
+            validation_file_name = ['K_GROUPS_' model_names{i} ...
+                                    '__' int2str(validation_set_index) ...
+                                    '__' int2str(val_file_index) '.png'];
+            validation_data = cell(2,1);
+            single_val_trial_data = {val_trials_data{val_file_index,1}; ...
+                                     val_trials_data{val_file_index,2}};
+            ValidateTrial( temp_model, single_val_trial_data, validation_file_name, 0 );
+        end
+        
+        clear temp_model val_folder val_trials_data single_val_trial_data validation_file_name val_file_index
+        close all;
+        fclose all;
     end
 end
 clear hand_strings hand_folders model_names folders
