@@ -38,16 +38,16 @@ function [ k_sets, k_sets_indexes ] = SeparateDataInKGroups( processed_data, num
 
     %Sorting of the data into sets
     for k = 1:number_k_sets
-                initial = 1 + k_set_trials*(k-1);
-                final = k_set_trials*(k);
-                k_sets(k).left.x = processed_data.left.x(initial:final,1:end)';
-                k_sets(k).left.y = processed_data.left.y(initial:final,1:end)';
-                k_sets(k).left.z = processed_data.left.z(initial:final,1:end)';
-                k_sets(k).right.x = processed_data.right.x(initial:final,1:end)';
-                k_sets(k).right.y = processed_data.right.y(initial:final,1:end)';
-                k_sets(k).right.z = processed_data.right.z(initial:final,1:end)';
+        initial = 1 + k_set_trials*(k-1);
+        final = k_set_trials*(k);
+        k_sets(k).left.x = processed_data.left.x(initial:final,1:end)';
+        k_sets(k).left.y = processed_data.left.y(initial:final,1:end)';
+        k_sets(k).left.z = processed_data.left.z(initial:final,1:end)';
+        k_sets(k).right.x = processed_data.right.x(initial:final,1:end)';
+        k_sets(k).right.y = processed_data.right.y(initial:final,1:end)';
+        k_sets(k).right.z = processed_data.right.z(initial:final,1:end)';
 
-                k_sets_indexes(k,:) = initial:final;
+        k_sets_indexes(k,:) = initial:final;
     end
 
 end

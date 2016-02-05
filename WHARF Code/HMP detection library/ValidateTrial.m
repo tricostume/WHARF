@@ -12,7 +12,7 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     model_hands = {'left_hand', 'right_hand'};
     
     % Set result file names
-    result_file_name = [res_folder 'RES_' file_name];
+    result_file_name = [res_folder 'RES_' file_name(1:end-4)];
     graph_file_name = [res_folder 'GRAPH_' file_name(1:end-4)];
     
     % DEFINE THE VALIDATION PARAMETERS
@@ -85,6 +85,12 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
 
     % Get the full probability for both hands uncorrelated model
     possibilities = hand_possibilities(:,:, 1).*hand_possibilities(:,:, 2);
+    
+    save(result_file_name, ...
+        'possibilities', ...
+        'hand_possibilities', ...
+        'hand_dist', ...
+        '-v7.3');
 
     % plot the possibilities curves for the models
     x = min_window_size:1:num_samples;

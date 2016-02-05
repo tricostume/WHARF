@@ -66,35 +66,6 @@ for i=1:length(folders)
     folder = [folders(i).name '\'];
     trials_data = GetTrialsData([main_folder folder]);
 
-
-    % DEFINE CONSTANTS
-    model_hands = {'left_hand', 'right_hand'};
-
-    % DEFINE THE VALIDATION PARAMETERS
-    % compute the size of the sliding window
-    % (size of the largest model + 64 samples)
-    numModels = length(models);
-    numHands = size(model_hands, 2);
-    models_size = zeros(1, numModels);
-    for m=1:1:numModels
-        % Left hand model should have same size as right hand, so just get one
-        % of them
-        models_size(m) = size(models(m).left_hand.bP,2)+64;
-    end
-    window_size = max(models_size);
-    % create an array with the models thresholds
-    thresholds = zeros(numHands, numModels);
-    for m=1:1:numModels
-        for hand_index=1:numHands
-            thresholds(hand_index, m) = models(m).(model_hands{hand_index}).threshold;
-        end
-    end
-    % initialize the results arrays
-    hand_dist = zeros(numHands, numModels);
-    hand_possibilities = zeros(1, numModels, numHands);
-    possibilities = zeros(1, numModels);
-
-
     % ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
     files = dir([[main_folder folder], '*.mat'])';
     % Get number of data entries.
