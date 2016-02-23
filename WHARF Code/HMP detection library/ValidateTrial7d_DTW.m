@@ -1,4 +1,4 @@
-function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
+function [  ] = ValidateTrial7d_DTW( models, trial_data, file_name, debug_mode )
     use_DTW = 0;
 
     % Define default value for flag debugMode as false
@@ -6,13 +6,13 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         debug_mode = 0;
     end
 	% Define constants
-    res_folder = 'Data\RESULTS\';
+    res_folder = 'Data\RESULTS7d_DTW\';
     % Set result file names
     resultFileName = [res_folder 'RES_' file_name(1:end-4)];
     graph_file_name = [res_folder 'GRAPH_' file_name(1:end-4)];
-    if use_DTW == 1
-    graph_file_nameDTW = [res_folder 'GRAPHDTW_' file_name(1:end-4)];
-    end
+%     if use_DTW == 1
+%     graph_file_nameDTW = [res_folder 'GRAPHDTW_' file_name(1:end-4)];
+%     end
     graph_file_name_prob = [res_folder 'GRAPH_PROB__' file_name(1:end-4)];
 
     % transform the trial into a stream of samples
@@ -50,9 +50,9 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
     
     % initialize the results arrays
     dist = zeros(1, numModels);
-    if use_DTW == 1
-    dist_DTW = zeros(1, numModels);
-    end
+%     if use_DTW == 1
+%     dist_DTW = zeros(1, numModels);
+%     end
     hand_possibilities = zeros(1, numModels, 1);
     probabilities = zeros(1, numModels);
     
@@ -73,8 +73,8 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
                 model = models(m);
                 if numWritten > models_size(m)
                     %[dist(1, m),probabilities(1,m)] = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
-                    [dist(1, m), probabilities(1,m)] = ...
-                                    CompareWithModels7d( ...
+                    dist(1, m) = ...
+                                    CompareWithModels_DTW( ...
                                         gravity(end-models_size(m)+1:end-64,:), ...
                                         body(end-models_size(m)+1:end-64,:), ...
                                         model.gP, model.gS, ...
@@ -82,37 +82,38 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
                     
                     
                     
-                    if use_DTW == 1
-                    dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:), ...
-                                                        body(1:models_size(m)-64,:), ...
-                                                        model.gP,model.gS,model.bP,model.bS);
-                    end   
+%                     if use_DTW == 1
+%                     dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:), ...
+%                                                         body(1:models_size(m)-64,:), ...
+%                                                         model.gP,model.gS, ...
+%                                                         model.bP,model.bS);
+%                     end   
                     % Logging distances
                        log_dist(j,m) = dist(1,m);
-                       if use_DTW == 1
-                       log_dist_DTW(j,m) = dist_DTW(1,m);
-                       end
+%                        if use_DTW == 1
+%                        log_dist_DTW(j,m) = dist_DTW(1,m);
+%                        end
                     else
                         dist(1, m) = inf;
-                        if use_DTW == 1
-                        dist_DTW(1,m) = inf;
-                        end
-                        probabilities(1,m) = 0;
+%                         if use_DTW == 1
+%                         dist_DTW(1,m) = inf;
+%                         end
+%                         probabilities(1,m) = 0;
                 end    
             end
             % classify the current data
             hand_possibilities(j,:, 1) = Classify(dist(1, :),thresholds(1, :));
-            if use_DTW == 1
-            hand_possibilities_DTW(j,:,1) = Classify(dist_DTW(1, :),thresholds(1, :));
-            end
-            hand_probabilities(j,:,1) = probabilities;
+%             if use_DTW == 1
+%             hand_possibilities_DTW(j,:,1) = Classify(dist_DTW(1, :),thresholds(1, :));
+%             end
+%             hand_probabilities(j,:,1) = probabilities;
 
         else
             hand_possibilities(j,:, 1) = zeros(1,numModels);
-            if use_DTW == 1
-            hand_possibilities_DTW(j,:, 1) = zeros(1,numModels);
-            end
-            hand_probabilities(j,:,1) = zeros(1,numModels);
+%             if use_DTW == 1
+%             hand_possibilities_DTW(j,:, 1) = zeros(1,numModels);
+%             end
+%             hand_probabilities(j,:,1) = zeros(1,numModels);
         end
         if mod(j, 50) == 0
            disp(['------- ' file_name(1:end-4) ' Completed: ' int2str(j) '/ ' int2str(num_samples)]);
@@ -124,14 +125,13 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
 
         % log the classification results in the log file
          possibilities = hand_possibilities(:,:, 1);
-         if use_DTW == 1
-         possibilities_DTW = hand_possibilities_DTW(:,:,1);
-         end
-         final_probabilities =  hand_probabilities(:,:, 1);
+%          if use_DTW == 1
+%          possibilities_DTW = hand_possibilities_DTW(:,:,1);
+%          end
+%          final_probabilities =  hand_probabilities(:,:, 1);
         save(resultFileName, ...
         'possibilities', ...
         'log_dist', ...
-        'final_probabilities', ...
         '-v7.3');
 
     % Plot the possibilities and probabilities curves for the models
@@ -139,8 +139,8 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         min_window_size, num_samples, numModels, debug_mode);
 %     PlotAndPrint(graph_file_name_DTW, models, possibilities_DTW, ...
 %         min_window_size, num_samples, numModels, debug_mode);
-    PlotAndPrint(graph_file_name_prob, models, final_probabilities, ...
-        min_window_size, num_samples, numModels, debug_mode);
+%     PlotAndPrint(graph_file_name_prob, models, final_probabilities, ...
+%         min_window_size, num_samples, numModels, debug_mode);
     
     
     
