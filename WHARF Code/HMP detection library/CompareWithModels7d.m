@@ -79,8 +79,8 @@ for i=1:1:numPoints
         catch
            % Try to eliminate numerical problems by adding a really small
            % value to sigma
-           bigger_g_sigma = MODELgS(:,:,find(time==x)) + 2E-2.*diag(ones(6,1));
-           bigger_b_sigma = MODELbS(:,:,find(time==x)) + 2E-2.*diag(ones(6,1));
+           bigger_g_sigma = MODELgS(:,:,find(time==x)) + 30E-2.*diag(ones(6,1));
+           bigger_b_sigma = MODELbS(:,:,find(time==x)) + 30E-2.*diag(ones(6,1));
            try
                 probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
                 probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
