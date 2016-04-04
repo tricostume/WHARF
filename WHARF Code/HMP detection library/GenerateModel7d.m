@@ -83,7 +83,7 @@ numGMRPoints = ceil(numPoints*scaling_factor);
 % over 3 2D domains (time + mono-axial acceleration)
 darkcolor = [0.8 0 0];
 lightcolor = [1 0.7 0.7];
-figure,
+fig=figure,
     % gravity
     % time and gravity acceleration along x
     subplot(3,2,1);
@@ -161,3 +161,9 @@ figure,
     axis([min(body(1,:)) max(body(1,:)) min(body(4,:)) max(body(4,:))]);
     title ('body - z axis');
     xlabel('time [samples]');
+    
+    graph_file_name = [folder(1:end-4) '_GRAPH'];
+    print(fig, graph_file_name, '-dpng');
+    print(fig, graph_file_name, '-deps');
+    
+    

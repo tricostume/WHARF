@@ -56,7 +56,7 @@
 load models_and_thresholds.mat
 
 % DEFINE THE VALIDATION FOLDER TO BE USED AND GET DATA FROM IT
-main_folder = 'Data\VALIDATION\';
+main_folder = 'Data\K-GROUPS\VALIDATION\SET_6\';
 % Get list of folders with data to be validated
 folders = dir(main_folder);
 folders = folders(~ismember({folders.name},{'.','..'}));
@@ -72,9 +72,9 @@ for i=1:length(folders)
         trials_dataT{packing,1}(1:7,:) = [trials_data{packing,1}(1:4,:); ...
                                           trials_data{packing,2}(2:4,:)];
     end
-    clear trials_data
+    clearvars trials_data
     trials_data = trials_dataT;
-    clear trials_dataT
+    clearvars trials_dataT
 
     
     % DEFINE THE VALIDATION PARAMETERS
@@ -114,5 +114,6 @@ for i=1:length(folders)
         % Validate trial
         %disp(['---Validating trial:' num2str(k) ': ' file_name(1:end-4) ' ']);
         ValidateTrial7d( models, single_trial_data, file_name, 1 );
+        close all;
     end
 end

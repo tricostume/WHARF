@@ -46,7 +46,6 @@
 
 % CREATE THE MODELS AND ASSOCIATED THRESHOLDS
 scale = 1.5;  % experimentally set scaling factor for the threshold computation
-number_k_sets = 5;
 
 % Constants
 hand_strings = {'- Building left hand model...';
@@ -54,7 +53,7 @@ hand_strings = {'- Building left hand model...';
 
 % Models to be ran
 model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', 'RemovingFromFridge', 'WardrobeOpening'};
-folder = 'Data\PREPROCESSED_DATA\';
+folder = 'Data\K-GROUPS\TRAINING\SET_6\';
 
 % Preallocating models array struct
 models = repmat(struct('name',{''}, 'gP', [], 'gS', [], 'bP', [], 'bS',[], 'threshold', []), size(model_names, 2), 1 );
@@ -88,6 +87,6 @@ end
 clear hand_strings hand_folders model_names folders
 
 % SAVE THE MODELS IN THE CURRENT DIRECTORY
-save models_and_thresholds.mat
+save models_and_thresholds7d.mat
 
 
