@@ -6,7 +6,7 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         debug_mode = 0;
     end
 	% Define constants
-    res_folder = 'Data\K-GROUPS\RESULTS\SET_1_2';
+    res_folder = 'Data\K-GROUPS\RESULTS\SET_2_2\';
     % Set result file names
     resultFileName = [res_folder 'RES_' file_name(1:end-4)];
     graph_file_name = [res_folder 'GRAPH_' file_name(1:end-4)];
@@ -16,7 +16,7 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
     graph_file_name_prob = [res_folder 'GRAPH_PROB__' file_name(1:end-4)];
 
     % transform the trial into a stream of samples
-    current_data = trial_data(2:7,1:end);   % remove timestamp data
+    current_data = [trial_data(2:7,1:end),zeros(6,300)];   % remove timestamp data
     numSamples = size(current_data, 2);
     % DEFINE THE VALIDATION PARAMETERS
     % compute the size of the sliding window
@@ -40,7 +40,7 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
     
     % Since two hands have same number of samples for a specific trial, get
     % number of samples from left hand.
-    num_samples = size(trial_data, 2);
+    num_samples = size(current_data, 2);
     % If number of samples in trial is smaller than window size, ignore
     % trial
     if num_samples < min_window_size
@@ -72,7 +72,6 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
             for m=1:1:numModels
                 model = models(m);
                 if numWritten > models_size(m)
-                    %[dist(1, m),probabilities(1,m)] = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
                     difference = size(gravity,1)-models_size(m);
                     if difference<0
                         gravity = [zeros(-difference,6);gravity];
