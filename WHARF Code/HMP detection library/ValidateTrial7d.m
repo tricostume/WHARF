@@ -6,7 +6,6 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         debug_mode = 0;
     end
 	% Define constants
-    res_folder = 'Data\K-GROUPS\RESULTS\SET_6\';
     % Set result file names
     resultFileName = [res_folder 'RES_' file_name(1:end-4)];
     graph_file_name = [res_folder 'GRAPH_' file_name(1:end-4)];
@@ -73,6 +72,11 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
                 model = models(m);
                 if numWritten > models_size(m)
                     %[dist(1, m),probabilities(1,m)] = CompareWithModels7d(gravity(1:models_size(m)-64,:),body(1:models_size(m)-64,:),model.gP,model.gS,model.bP,model.bS);
+                    difference = size(gravity,1)-models_size(m);
+                    if difference<0
+                        gravity = [zeros(-difference,6);gravity];
+                        body = [zeros(-difference,6);body];
+                    end
                     [dist(1, m), probabilities(1,m)] = ...
                                     CompareWithModels7d( ...
                                         gravity(end-models_size(m)+1:end-64,:), ...

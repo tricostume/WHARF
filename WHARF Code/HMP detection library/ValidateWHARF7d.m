@@ -54,9 +54,15 @@
 % LOAD THE MODELS OF THE HMP IN HMPDATASET
 % (models of the known activities and classification thresholds)
 load models_and_thresholds.mat
+models(6).gP=zeros(7,294);
+models(6).bP=zeros(7,294);
+models(6).gS=zeros(6,6,294);
+models(6).bS=zeros(6,6,294);
+models(6).threshold=0;
+models(6).name='Dummy';
 
 % DEFINE THE VALIDATION FOLDER TO BE USED AND GET DATA FROM IT
-main_folder = 'Data\K-GROUPS\VALIDATION\SET_6\';
+main_folder = 'Data\K-GROUPS\VALIDATION\SET_1\';
 % Get list of folders with data to be validated
 folders = dir(main_folder);
 folders = folders(~ismember({folders.name},{'.','..'}));
