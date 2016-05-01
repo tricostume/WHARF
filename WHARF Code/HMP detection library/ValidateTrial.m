@@ -8,7 +8,7 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     end
     
     % Define constants
-    res_folder = 'Data\RESULTS\';
+    res_folder = 'Data\K-GROUPS\RESULTS\SET_3_2\';
     model_hands = {'left_hand', 'right_hand'};
     
     % Set result file names
@@ -17,6 +17,9 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     graph_file_name_DTW = [res_folder 'GRAPH_POSS_DTW__' file_name(1:end-4)];
     graph_file_name_prob = [res_folder 'GRAPH_PROB__' file_name(1:end-4)];
     
+    % transform the trial into a stream of samples
+   % current_data = [trial_data(2:4,1:end),zeros(3,300)];   % remove timestamp data
+    %numSamples = size(current_data, 2);
     % DEFINE THE VALIDATION PARAMETERS
     % compute the size of the sliding window
     % (size of the largest model + 64 samples)
@@ -40,6 +43,8 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     
     % Since two hands have same number of samples for a specific trial, get
     % number of samples from left hand.
+    trial_data{1} = [trial_data{1},zeros(4,300)];
+    trial_data{2} = [trial_data{2},zeros(4,300)];
     num_samples = size(trial_data{1}, 2);
     % If number of samples in trial is smaller than window size, ignore
     % trial
@@ -76,6 +81,11 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
                     % If current window size is bigger than model compute
                     % distance, else set distance to infinite so prob is 0
                     if numWritten > models_size(m)
+                        difference = size(gravity,1)-models_size(m);
+                    if difference<0
+                        gravity = [zeros(-difference,3);gravity];
+                        body = [zeros(-difference,3);body];
+                    end
                         [hand_dist(hand_index, m), temp_probabilities(m)] = ...
                                     CompareWithModels( ...
                                         gravity(end-models_size(m)+1:end-64,:), ...
@@ -146,6 +156,7 @@ function [] = PlotAndPrint(graph_file_name, models, plotted_values, min_window_s
     end
     
     plot(x, plotted_values(min_window_size:end,:));
+    title(graph_file_name)
     % title()
     h = legend(models(:).name, numModels);
     set(h,'Interpreter','none');
