@@ -8,7 +8,7 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     end
     
     % Define constants
-    res_folder = 'Data\K-GROUPS\RESULTS\SET_3_2\';
+    res_folder = 'Data\K-GROUPS\RESULTS\4X4_SET_6\';
     model_hands = {'left_hand', 'right_hand'};
     
     % Set result file names

@@ -67,7 +67,7 @@ models(6).right_hand.threshold=0;
 models(6).name='Dummy';
 
 % DEFINE THE VALIDATION FOLDER TO BE USED AND GET DATA FROM IT
-main_folder = 'Data\K-GROUPS\VALIDATION\SET_3\';
+main_folder = 'Data\K-GROUPS\VALIDATION\SET_6\';
 % Get list of folders with data to be validated
 folders = dir(main_folder);
 folders = folders(~ismember({folders.name},{'.','..'}));
@@ -81,7 +81,7 @@ for i=1:length(folders)
     files = dir([[main_folder folder], '*.mat'])';
     % Get number of data entries.
     numFiles = size(trials_data, 1);
-    for file_index=1:1:numFiles
+    for file_index=1:1:13
         % Get current trial file name
         file_name = files(file_index).name;
         % Get single trial's data

@@ -79,6 +79,7 @@ numGMRPoints = ceil(numPoints*scaling_factor);
 [b_points b_sigma] = GetExpected7d(body,K_body,numGMRPoints,0);
 
 % DISPLAY THE RESULTS
+set(0,'defaultfigurecolor',[1 1 1])
 % display the GMR results for the GRAVITY and BODY ACC. features projected
 % over 3 2D domains (time + mono-axial acceleration)
 darkcolor = [0.8 0 0];
@@ -96,7 +97,7 @@ fig=figure,
     hold on;
     plot(gr_points(1,:),gr_points(2,:),'-','linewidth',3,'color',darkcolor);
     axis([min(gravity(1,:)) max(gravity(1,:)) min(gravity(2,:)) max(gravity(2,:))]);
-    title ('gravity - x axis');
+    title ('Correlated gravity (D=2)');
     % time and gravity acceleration along y
     subplot(3,2,3);
     for i=1:1:numGMRPoints
@@ -108,7 +109,7 @@ fig=figure,
     hold on;
     plot(gr_points(1,:),gr_points(3,:),'-','linewidth',3,'color',darkcolor);
     axis([min(gravity(1,:)) max(gravity(1,:)) min(gravity(3,:)) max(gravity(3,:))]);
-    title ('gravity - y axis');
+    title ('Correlated gravity (D=3)');
     ylabel('acceleration [m/s^2]');
     % time and gravity acceleration along z
     subplot(3,2,5);
@@ -121,7 +122,7 @@ fig=figure,
     hold on;
     plot(gr_points(1,:),gr_points(4,:),'-','linewidth',3,'color',darkcolor);
     axis([min(gravity(1,:)) max(gravity(1,:)) min(gravity(4,:)) max(gravity(4,:))]);
-    title ('gravity - z axis');
+    title ('Correlated gravity (D=4)');
     xlabel('time [samples]');
     % body
     % time and body acc. acceleration along x
@@ -135,7 +136,7 @@ fig=figure,
     hold on;
     plot(b_points(1,:),b_points(2,:),'-','linewidth',3,'color',darkcolor);
     axis([min(body(1,:)) max(body(1,:)) min(body(2,:)) max(body(2,:))]);
-    title ('body - x axis');
+    title ('Correlated body (D=2)');
     % time and body acc. acceleration along y
     subplot(3,2,4);
     for i=1:1:numGMRPoints
@@ -147,7 +148,7 @@ fig=figure,
     hold on;
     plot(b_points(1,:),b_points(3,:),'-','linewidth',3,'color',darkcolor);
     axis([min(body(1,:)) max(body(1,:)) min(body(3,:)) max(body(3,:))]);
-    title ('body - y axis');
+    title ('Correlated body (D=3)');
     % time and body acc. acceleration along z
     subplot(3,2,6);
     for i=1:1:numGMRPoints
@@ -159,9 +160,97 @@ fig=figure,
     hold on;
     plot(b_points(1,:),b_points(4,:),'-','linewidth',3,'color',darkcolor);
     axis([min(body(1,:)) max(body(1,:)) min(body(4,:)) max(body(4,:))]);
-    title ('body - z axis');
+    title ('Correlated body (D=4)');
     xlabel('time [samples]');
-    
+    res_folder = 'Data\K-GROUPS\RESULTS\SET_1\';
+    graph_file_name = [res_folder 'GRAPH_' folder(end-5:end)];
+    print(fig, graph_file_name, '-dpng');
+ %---------------------------------------------------------------------
+ %---------------------------------------------------------------------
+ % SECOND GRAPH
+ 
+ fig2=figure,
+    % gravity
+    % time and gravity acceleration along x
+    subplot(3,2,1);
+    for i=1:1:numGMRPoints
+        sigma = sqrtm(3.*gr_sigma(:,:,i));
+        maximum(i) = gr_points(5,i) + sigma(1,1);
+        minimum(i) = gr_points(5,i) - sigma(1,1);
+    end
+    patch([gr_points(1,1:end) gr_points(1,end:-1:1)], [maximum(1:end) minimum(end:-1:1)], lightcolor);
+    hold on;
+    plot(gr_points(1,:),gr_points(5,:),'-','linewidth',3,'color',darkcolor);
+    axis([min(gravity(1,:)) max(gravity(1,:)) min(gravity(5,:)) max(gravity(5,:))]);
+    title ('Correlated gravity (D=5)');
+    % time and gravity acceleration along y
+    subplot(3,2,3);
+    for i=1:1:numGMRPoints
+        sigma = sqrtm(3.*gr_sigma(:,:,i));
+        maximum(i) = gr_points(6,i) + sigma(2,2);
+        minimum(i) = gr_points(6,i) - sigma(2,2);
+    end
+    patch([gr_points(1,1:end) gr_points(1,end:-1:1)], [maximum(1:end) minimum(end:-1:1)], lightcolor);
+    hold on;
+    plot(gr_points(1,:),gr_points(6,:),'-','linewidth',3,'color',darkcolor);
+    axis([min(gravity(1,:)) max(gravity(1,:)) min(gravity(6,:)) max(gravity(6,:))]);
+    title ('Correlated gravity (D=6)');
+    ylabel('acceleration [m/s^2]');
+    % time and gravity acceleration along z
+    subplot(3,2,5);
+    for i=1:1:numGMRPoints
+        sigma = sqrtm(3.*gr_sigma(:,:,i));
+        maximum(i) = gr_points(7,i) + sigma(3,3);
+        minimum(i) = gr_points(7,i) - sigma(3,3);
+    end
+    patch([gr_points(1,1:end) gr_points(1,end:-1:1)], [maximum(1:end) minimum(end:-1:1)], lightcolor);
+    hold on;
+    plot(gr_points(1,:),gr_points(7,:),'-','linewidth',3,'color',darkcolor);
+    axis([min(gravity(1,:)) max(gravity(1,:)) min(gravity(7,:)) max(gravity(7,:))]);
+    title ('Correlated gravity (D=7)');
+    xlabel('time [samples]');
+    % body
+    % time and body acc. acceleration along x
+    subplot(3,2,2);
+    for i=1:1:numGMRPoints
+        sigma = sqrtm(3.*b_sigma(:,:,i));
+        maximum(i) = b_points(5,i) + sigma(1,1);
+        minimum(i) = b_points(5,i) - sigma(1,1);
+    end
+    patch([b_points(1,1:end) b_points(1,end:-1:1)], [maximum(1:end) minimum(end:-1:1)], lightcolor);
+    hold on;
+    plot(b_points(1,:),b_points(5,:),'-','linewidth',3,'color',darkcolor);
+    axis([min(body(1,:)) max(body(1,:)) min(body(5,:)) max(body(5,:))]);
+    title ('Correlated body (D=5)');
+    % time and body acc. acceleration along y
+    subplot(3,2,4);
+    for i=1:1:numGMRPoints
+        sigma = sqrtm(3.*b_sigma(:,:,i));
+        maximum(i) = b_points(6,i) + sigma(2,2);
+        minimum(i) = b_points(6,i) - sigma(2,2);
+    end
+    patch([b_points(1,1:end) b_points(1,end:-1:1)], [maximum(1:end) minimum(end:-1:1)], lightcolor);
+    hold on;
+    plot(b_points(1,:),b_points(6,:),'-','linewidth',3,'color',darkcolor);
+    axis([min(body(1,:)) max(body(1,:)) min(body(6,:)) max(body(6,:))]);
+    title ('Correlated body (D=6)');
+    % time and body acc. acceleration along z
+    subplot(3,2,6);
+    for i=1:1:numGMRPoints
+        sigma = sqrtm(3.*b_sigma(:,:,i));
+        maximum(i) = b_points(7,i) + sigma(3,3);
+        minimum(i) = b_points(7,i) - sigma(3,3);
+    end
+    patch([b_points(1,1:end) b_points(1,end:-1:1)], [maximum(1:end) minimum(end:-1:1)], lightcolor);
+    hold on;
+    plot(b_points(1,:),b_points(7,:),'-','linewidth',3,'color',darkcolor);
+    axis([min(body(1,:)) max(body(1,:)) min(body(7,:)) max(body(7,:))]);
+    title ('Correlated body (D=7)');
+    xlabel('time [samples]');
+ 
+ 
+ %---------------------------------------------------------------------
+ %---------------------------------------------------------------------
     graph_file_name = [folder(1:end-4) '_GRAPH'];
     print(fig, graph_file_name, '-dpng');
     print(fig, graph_file_name, '-deps');

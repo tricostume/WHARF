@@ -6,7 +6,7 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         debug_mode = 0;
     end
 	% Define constants
-    res_folder = 'Data\K-GROUPS\RESULTS\SET_2_2\';
+    res_folder = 'Data\K-GROUPS\RESULTS\SET_6_2\';
     % Set result file names
     resultFileName = [res_folder 'RES_' file_name(1:end-4)];
     graph_file_name = [res_folder 'GRAPH_' file_name(1:end-4)];

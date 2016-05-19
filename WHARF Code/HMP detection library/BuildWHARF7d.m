@@ -53,7 +53,7 @@ hand_strings = {'- Building left hand model...';
 
 % Models to be ran
 model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', 'RemovingFromFridge', 'WardrobeOpening'};
-folder = 'Data\K-GROUPS\TRAINING\SET_6\';
+folder = 'Data\K-GROUPS\TRAINING\SET_1\';
 
 % Preallocating models array struct
 models = repmat(struct('name',{''}, 'gP', [], 'gS', [], 'bP', [], 'bS',[], 'threshold', []), size(model_names, 2), 1 );

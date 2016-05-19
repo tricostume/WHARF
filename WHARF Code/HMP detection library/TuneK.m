@@ -55,7 +55,7 @@ end
 threshold = 0.69;   % threshold on the FITNESS of the current clustering
 minK = 2;           % initial number of clusters to be used
 % first step is outside of the loop to have meaningful initial values
-assignments = kmeans(set',minK, 'emptyaction','drop');
+assignments = kmeans(set',minK, 'EmptyAction','drop');
 s = silhouette(set',assignments,'sqeuclid');
 for i=1:1:minK
     s_cluster(i) = sum(s(find(assignments == i)))/length(s(find(assignments == i)));

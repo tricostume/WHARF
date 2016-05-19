@@ -1,4 +1,4 @@
-load('1454599282520A_Swp_2_Jessica_VAL.mat')
+load('117113131A_Swp_Divya.mat')
 figure;
 subplot(3,2,1); plot(single_trial_data{1,1}(2,:));
 axis([0 2000 -25 15]);
