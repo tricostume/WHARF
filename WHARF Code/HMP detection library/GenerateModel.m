@@ -1,4 +1,4 @@
-function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel( training_data, numSamples )
+function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel( training_data, numSamples, debugMode)
 %GENERATEMODEL Generate gravity and body model for a activity
 %
 % -------------------------------------------------------------------------
@@ -53,6 +53,11 @@ function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel( training_data
 % hand_index=1;
 % [model_gP, model_gS, model_bP, model_bS] = GenerateModel(train_processed_data.left, numSamples);
 
+% Define default value for flag printGraphs as true
+if nargin < 3 || isempty(debugMode)
+    debugMode = 1;
+end
+
 %Extracting accelerations in respective co-ordinate axes
 x_set = training_data.x;
 y_set = training_data.y;
@@ -77,11 +82,12 @@ numGMRPoints = ceil(numPoints*scaling_factor);
 [b_points, b_sigma] = GetExpected(body, K_body, numGMRPoints,0);
 
 % DISPLAY THE RESULTS
-% display the GMR results for the GRAVITY and BODY ACC. features projected
-% over 3 2D domains (time + mono-axial acceleration)
-darkcolor = [0.8 0 0];
-lightcolor = [1 0.7 0.7];
-figure,
+if (debugMode == 1)
+    % display the GMR results for the GRAVITY and BODY ACC. features projected
+    % over 3 2D domains (time + mono-axial acceleration)
+    darkcolor = [0.8 0 0];
+    lightcolor = [1 0.7 0.7];
+    figure,
     % gravity
     % time and gravity acceleration along x
     subplot(3,2,1);
@@ -159,3 +165,4 @@ figure,
     axis([min(body(1,:)) max(body(1,:)) min(body(4,:)) max(body(4,:))]);
     title ('body - z axis');
     xlabel('time [samples]');
+end

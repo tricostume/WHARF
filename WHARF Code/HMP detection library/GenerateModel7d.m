@@ -1,4 +1,4 @@
-function [gr_points gr_sigma b_points b_sigma] = GenerateModel7d(folder)
+function [gr_points, gr_sigma, b_points, b_sigma] = GenerateModel7d(folder, debugMode)
 % function [gr_points gr_sigma b_points b_sigma] = GenerateModel(folder)
 %
 % -------------------------------------------------------------------------
@@ -50,6 +50,10 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel7d(folder)
 %[xl yl zl numSamplesl] = GetTrialsData(folder_left);
 %[xr yr zr numSamplesr] = GetTrialsData(folder_right,0);
 
+% Define default value for flag printGraphs as true
+if nargin < 2 || isempty(debugMode)
+    debugMode = 1;
+end
 
 [x_left,y_left,z_left, numSamples_left] = GetProcessedData7d(folder,1);
 [x_right,y_right,z_right, numSamples_right] = GetProcessedData7d(folder,2);
@@ -58,8 +62,8 @@ function [gr_points gr_sigma b_points b_sigma] = GenerateModel7d(folder)
 % SEPARATE THE GRAVITY AND BODY-MOTION ACCELERATION COMPONENTS...
 % ... AND CREATE THE DATASETS FOR GM-MODELING
 %[gravity body] = CreateDatasets(numSamples,x_set,y_set,z_set,0);
-[gravity_left body_left] = CreateDatasets(numSamples_left,x_left,y_left,z_left,0);
-[gravity_right body_right] = CreateDatasets(numSamples_right,x_right,y_right,z_right,0);
+[gravity_left, body_left] = CreateDatasets(numSamples_left,x_left,y_left,z_left,0);
+[gravity_right, body_right] = CreateDatasets(numSamples_right,x_right,y_right,z_right,0);
 % // FOR NOW CUTTING, PASS PREPROCESSED DATA TO THE FUNCTION
 gravity = [gravity_left;gravity_right(2:4,:)];
 body = [body_left;body_right(2:4,:)];
@@ -75,16 +79,17 @@ scaling_factor = 10/10;
 numGMRPoints = ceil(numPoints*scaling_factor);
 % 3) perform Gaussian Mixture Modelling and Regression to retrieve the
 %    expected curve and associated covariance matrices for each feature
-[gr_points gr_sigma] = GetExpected7d(gravity,K_gravity,numGMRPoints,0);
-[b_points b_sigma] = GetExpected7d(body,K_body,numGMRPoints,0);
+[gr_points, gr_sigma] = GetExpected7d(gravity,K_gravity,numGMRPoints,0);
+[b_points, b_sigma] = GetExpected7d(body,K_body,numGMRPoints,0);
 
-% DISPLAY THE RESULTS
-set(0,'defaultfigurecolor',[1 1 1])
-% display the GMR results for the GRAVITY and BODY ACC. features projected
-% over 3 2D domains (time + mono-axial acceleration)
-darkcolor = [0.8 0 0];
-lightcolor = [1 0.7 0.7];
-fig=figure,
+% DEBUG: PLOT THE EXPECTED CURVE AND ASSOCIATED COVARIANCE (2D)
+if (debugMode == 1)
+    set(0,'defaultfigurecolor',[1 1 1])
+    % display the GMR results for the GRAVITY and BODY ACC. features projected
+    % over 3 2D domains (time + mono-axial acceleration)
+    darkcolor = [0.8 0 0];
+    lightcolor = [1 0.7 0.7];
+    fig=figure,
     % gravity
     % time and gravity acceleration along x
     subplot(3,2,1);
@@ -165,11 +170,11 @@ fig=figure,
     res_folder = 'Data\K-GROUPS\RESULTS\SET_1\';
     graph_file_name = [res_folder 'GRAPH_' folder(end-5:end)];
     print(fig, graph_file_name, '-dpng');
- %---------------------------------------------------------------------
- %---------------------------------------------------------------------
- % SECOND GRAPH
- 
- fig2=figure,
+     %---------------------------------------------------------------------
+     %---------------------------------------------------------------------
+     % SECOND GRAPH
+
+     fig2=figure,
     % gravity
     % time and gravity acceleration along x
     subplot(3,2,1);
@@ -247,12 +252,12 @@ fig=figure,
     axis([min(body(1,:)) max(body(1,:)) min(body(7,:)) max(body(7,:))]);
     title ('Correlated body (D=7)');
     xlabel('time [samples]');
- 
- 
- %---------------------------------------------------------------------
- %---------------------------------------------------------------------
+
+
+     %---------------------------------------------------------------------
+     %---------------------------------------------------------------------
     graph_file_name = [folder(1:end-4) '_GRAPH'];
     print(fig, graph_file_name, '-dpng');
     print(fig, graph_file_name, '-deps');
-    
+end
     

@@ -1,4 +1,4 @@
-function [expData expSigma] = GetExpected7d(set,K,numGMRPoints,debugMode)
+function [expData, expSigma] = GetExpected7d(set,K,numGMRPoints,debugMode)
 % function [expData expSigma] = GetExpected(set,K,numGMRPoints,debugMode)
 %
 % -------------------------------------------------------------------------
@@ -83,10 +83,10 @@ numVar = 7;             % number of variables in the system (time & 3 accelerati
 numData = size(set,2);  % number of points in the dataset
 
 % INITIALIZE THE GAUSSIAN MIXTURE MODEL WITH K-MEANS CLUSTERING
-[priors mu sigma] = InitializeGMM(set,K,numVar,1);
+[priors, mu, sigma] = InitializeGMM(set,K,numVar,0);
 
 % TRAIN THE GAUSSIAN MIXTURE MODEL WITH E-M ALGORITHM
-[priors mu sigma] = TrainGMM(K,set,priors,mu,sigma,numVar,numData,0);
+[priors, mu, sigma] = TrainGMM(K,set,priors,mu,sigma,numVar,numData,0);
 
 % APPLY GAUSSIAN MIXTURE REGRESSION TO FIND THE EXPECTED CURVE
 % define the points to be used for the regression

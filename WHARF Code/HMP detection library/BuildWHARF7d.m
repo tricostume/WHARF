@@ -46,6 +46,7 @@
 
 % CREATE THE MODELS AND ASSOCIATED THRESHOLDS
 scale = 1.5;  % experimentally set scaling factor for the threshold computation
+print_graphs = 0;
 
 % Constants
 hand_strings = {'- Building left hand model...';
@@ -72,7 +73,7 @@ for i=1:size(model_names, 2)
     % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
     %[x_set y_set z_set numSamples] = GetProcessedData(modelfile,hand_index);
     % Generate models and compute thresholds
-    [model_gP, model_gS, model_bP, model_bS] = GenerateModel7d(modelfile);
+    [model_gP, model_gS, model_bP, model_bS] = GenerateModel7d(modelfile, print_graphs);
     model_threshold = ComputeThreshold7d(model_gP,model_gS,model_bP,model_bS,scale);
     hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
     % Save hand model data into model struct
