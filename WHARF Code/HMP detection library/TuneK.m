@@ -1,4 +1,4 @@
-function Koptimal = TuneK(set,maxK)
+function Koptimal = TuneK(set, maxK, debugMode)
 % function Koptimal = TuneK(set,maxK)
 %
 % -------------------------------------------------------------------------
@@ -49,6 +49,10 @@ function Koptimal = TuneK(set,maxK)
 if nargin < 2 || isempty(maxK)
     maxK = floor(max(set(1,:))/2);
 end
+% DEFINE THE VALUE FOR FLAG debugMode
+if nargin < 3 || isempty(debugMode)
+    debugMode = 0;
+end
 
 % DETERMINE THE OPTIMAL NUMBER OF CLUSTERS (K) FOR THE GIVEN DATASET
 % tuning parameters
@@ -79,7 +83,9 @@ if (Koptimal == maxK)
     warning('MATLAB:noConvergence','Failed to converge to the optimal K: increase maxK.');
 end
 
-% PLOT THE SILHOUETTE VALUES OF THE OPTIMAL K CLUSTERING
-assignments = kmeans(set',Koptimal);
-figure,
-    silhouette(set',assignments);
+% DEBUG: PLOT THE SILHOUETTE VALUES OF THE OPTIMAL K CLUSTERING
+if (debugMode == 1)
+    assignments = kmeans(set',Koptimal);
+    figure,
+        silhouette(set',assignments);
+end

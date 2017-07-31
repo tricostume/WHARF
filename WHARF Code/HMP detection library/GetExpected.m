@@ -1,4 +1,4 @@
-function [expData expSigma] = GetExpected(set,K,numGMRPoints,debugMode)
+function [expData, expSigma] = GetExpected(set,K,numGMRPoints,debugMode)
 % function [expData expSigma] = GetExpected(set,K,numGMRPoints,debugMode)
 %
 % -------------------------------------------------------------------------
