@@ -61,6 +61,8 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
 %     hand_possibilities_DTW = zeros(num_samples, numModels, numHands);
     hand_probabilities = zeros(num_samples, numModels, numHands);
     
+    val_times = zeros(num_samples, numModels);
+    
     for hand_index=1:1:numHands
         % transform the trial into a stream of samples
         current_data = trial_data{hand_index}(2:4,1:end);   % remove timestamp data

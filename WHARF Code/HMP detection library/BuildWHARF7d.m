@@ -56,33 +56,35 @@ model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', 'RemovingFrom
 folder = 'Data\K-GROUPS\TRAINING\SET_1\';
 
 % Preallocating models array struct
-models = repmat(struct('name',{''}, 'gP', [], 'gS', [], 'bP', [], 'bS',[], 'threshold', []), size(model_names, 2), 1 );
+models = repmat(struct('name',{''}, 'train_time', 0, 'gP', [], 'gS', [], 'bP', [], 'bS',[], 'threshold', []), size(model_names, 2), 1 );
 
 % Builds all specified models
 for i=1:size(model_names, 2)
     fprintf('Building %s model...\n', model_names{i});
-    models(i) = struct('name',{model_names{i}}, 'gP', [], 'gS', [], 'bP', [], 'bS', [], 'threshold', []);
+    models(i) = struct('name',{model_names{i}}, 'train_time', 0, 'gP', [], 'gS', [], 'bP', [], 'bS', [], 'threshold', []);
     %Getting the required mat file for the model into consideration
     modelfile= strcat(folder, model_names{i}, '_PREPROCESSED.mat');
     % Builds specified models for each hand
     
-        %disp(hand_strings{hand_index});
-        % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
-        %[x_set y_set z_set numSamples] = GetProcessedData(modelfile,hand_index);
-        % Generate models and compute thresholds
-        [model_gP, model_gS, model_bP, model_bS] = GenerateModel7d(modelfile);
-        model_threshold = ComputeThreshold7d(model_gP,model_gS,model_bP,model_bS,scale);
-        hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
-        % Save hand model data into model struct
-        
-            models(i).gP = hand_model.gP;
-            models(i).gS = hand_model.gS;
-            models(i).bP = hand_model.bP;
-            models(i).bS = hand_model.bS;
-            models(i).threshold = hand_model.threshold;
-        
-        clear model_gP model_gS model_bP model_bS model_threshold
+    tic()
     
+    %disp(hand_strings{hand_index});
+    % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
+    %[x_set y_set z_set numSamples] = GetProcessedData(modelfile,hand_index);
+    % Generate models and compute thresholds
+    [model_gP, model_gS, model_bP, model_bS] = GenerateModel7d(modelfile);
+    model_threshold = ComputeThreshold7d(model_gP,model_gS,model_bP,model_bS,scale);
+    hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
+    % Save hand model data into model struct
+    models(i).gP = hand_model.gP;
+    models(i).gS = hand_model.gS;
+    models(i).bP = hand_model.bP;
+    models(i).bS = hand_model.bS;
+    models(i).threshold = hand_model.threshold;
+
+    models(i).train_time = toc();
+
+    clear model_gP model_gS model_bP model_bS model_threshold
 end
 clear hand_strings hand_folders model_names folders
 

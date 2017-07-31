@@ -60,18 +60,20 @@ model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', ...
 folder = 'Data\PREPROCESSED_DATA\';
 
 % Preallocating models array struct
-models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', []), size(model_names, 2), 1 );
+models = repmat(struct('name',{''}, 'left_hand', [], 'right_hand', [], 'train_time', 0), size(model_names, 2), 1 );
 
 % Builds all specified models
 for i=1:size(model_names, 2)
     fprintf('Building %s model...\n', model_names{i});
-    models(i) = struct('name',{model_names{i}}, 'left_hand', [], 'right_hand', []);
+    models(i) = struct('name',{model_names{i}}, 'left_hand', [], 'right_hand', [], 'train_time', 0);
     %Getting the required mat file for the model into consideration
     modelfile = strcat(folder, model_names{i}, '_PREPROCESSED.mat');
     
     % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
     processed_data = GetProcessedData(modelfile);
     numSamples = processed_data.size;
+    
+    tic()
     
     % Transpose processed data
     processed_data.left.x = processed_data.left.x';
@@ -101,6 +103,7 @@ for i=1:size(model_names, 2)
 
         clear model_gP model_gS model_bP model_bS model_threshold
     end
+    models(i).train_time = toc();
 end
 clear hand_strings hand_folders model_names folders
 
