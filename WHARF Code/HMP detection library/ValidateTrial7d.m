@@ -59,6 +59,9 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
     % initialize the window of data to be used by the classifier
     window = zeros(window_size,6);
     numWritten = 0;
+    
+    val_times = zeros(1, num_samples);
+    full_times = zeros(num_samples, numModels);
 
     for j=1:1:numSamples
         current_sample = current_data(:,j);
@@ -66,10 +69,14 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         [window, numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
         % analysis is meaningful only when we have enough samples
         if (numWritten >= min_window_size)
+            time_out = tic();
+            
             % compute the acceleration components of the current window of samples
             [gravity, body] = AnalyzeActualWindow7d(window,window_size);
             % compute the difference between the actual data and each model
             for m=1:1:numModels
+                time_in = tic();
+                
                 model = models(m);
                 if numWritten > models_size(m)
                     difference = size(gravity,1)-models_size(m);
@@ -84,25 +91,25 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
                                         model.gP, model.gS, ...
                                         model.bP, model.bS);
                     
-                    
-                    
                     if use_DTW == 1
-                    dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:), ...
+                        dist_DTW(1,m) = CompareWithModels_DTW(gravity(1:models_size(m)-64,:), ...
                                                         body(1:models_size(m)-64,:), ...
                                                         model.gP,model.gS,model.bP,model.bS);
                     end   
                     % Logging distances
-                       log_dist(j,m) = dist(1,m);
-                       if use_DTW == 1
-                       log_dist_DTW(j,m) = dist_DTW(1,m);
-                       end
-                    else
-                        dist(1, m) = inf;
-                        if use_DTW == 1
+                    log_dist(j,m) = dist(1,m);
+                    if use_DTW == 1
+                        log_dist_DTW(j,m) = dist_DTW(1,m);
+                    end
+                else
+                    dist(1, m) = inf;
+                    if use_DTW == 1
                         dist_DTW(1,m) = inf;
-                        end
-                        probabilities(1,m) = 0;
+                    end
+                    probabilities(1,m) = 0;
                 end    
+                
+                full_times(j, m) = full_times(j, m) + toc(time_in);
             end
             % classify the current data
             hand_possibilities(j,:, 1) = Classify(dist(1, :),thresholds(1, :));
@@ -111,6 +118,7 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
             end
             hand_probabilities(j,:,1) = probabilities;
 
+            val_times(j) = val_times(j) + toc(time_out);
         else
             hand_possibilities(j,:, 1) = zeros(1,numModels);
             if use_DTW == 1
@@ -136,6 +144,8 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
         'possibilities', ...
         'log_dist', ...
         'final_probabilities', ...
+        'val_times', ...
+        'full_times', ...
         '-v7.3');
 
     % Plot the possibilities and probabilities curves for the models

@@ -89,6 +89,11 @@ for i=1:size(model_names, 2)
 end
 clear hand_strings hand_folders model_names folders
 
+times=zeros(1,5);
+for i=1:5
+    times(1,i) = models(i).train_time;
+end
+
 % SAVE THE MODELS IN THE CURRENT DIRECTORY
 save models_and_thresholds7d.mat
 

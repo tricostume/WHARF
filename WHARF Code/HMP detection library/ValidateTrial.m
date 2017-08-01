@@ -61,7 +61,8 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
 %     hand_possibilities_DTW = zeros(num_samples, numModels, numHands);
     hand_probabilities = zeros(num_samples, numModels, numHands);
     
-    val_times = zeros(num_samples, numModels);
+    val_times = zeros(1, num_samples);
+    full_times = zeros(num_samples, numModels);
     
     for hand_index=1:1:numHands
         % transform the trial into a stream of samples
@@ -75,10 +76,13 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
             [window, numWritten] = CreateWindow(current_sample,window,window_size,numWritten);
             % analysis is meaningful only when we have enough samples
             if (numWritten >= min_window_size)
+                time_out = tic();
+                
                 % compute the acceleration components of the current window of samples
                 [gravity, body] = AnalyzeActualWindow(window,window_size);
                 % compute the difference between the actual data and each model
                 for m=1:1:numModels
+                    time_in = tic();
                     model = models(m).(model_hands{hand_index});
                     % If current window size is bigger than model compute
                     % distance, else set distance to infinite so prob is 0
@@ -104,11 +108,15 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
 %                         hand_dist_DTW(hand_index, m) = inf;
                         temp_probabilities(m) = inf;
                     end
+                    
+                    full_times(j, m) = full_times(j, m) + toc(time_in);
                 end
                 % Classify the current data
                 hand_possibilities(j,:, hand_index) = Classify(hand_dist(hand_index, :),thresholds(hand_index, :));
 %                 hand_possibilities_DTW(j,:, hand_index) = Classify(hand_dist_DTW(hand_index, :),thresholds(hand_index, :));
                 hand_probabilities(j,:, hand_index) = temp_probabilities;
+                
+                val_times(j) = val_times(j) + toc(time_out);
             else
                 hand_possibilities(j,:, hand_index) = zeros(1,numModels);
 %                 hand_possibilities_DTW(j,:, hand_index) = zeros(1,numModels);
@@ -132,6 +140,8 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
         'hand_possibilities', ...
         'probabilities', ...
         'hand_probabilities', ...
+        'val_times', ...
+        'full_times', ...
         '-v7.3');
 %         'hand_possibilities_DTW', ...
 

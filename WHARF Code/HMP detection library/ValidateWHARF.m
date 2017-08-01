@@ -73,20 +73,38 @@ folders = dir(main_folder);
 folders = folders(~ismember({folders.name},{'.','..'}));
 
 % Builds all specified models
-for i=1:length(folders)
-    folder = [folders(i).name '\'];
-    trials_data = GetTrialsData([main_folder folder]);
 
-    % ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
-    files = dir([[main_folder folder], '*.mat'])';
-    % Get number of data entries.
-    numFiles = size(trials_data, 1);
-    for file_index=1:1:13
-        % Get current trial file name
-        file_name = files(file_index).name;
-        % Get single trial's data
-        single_trial_data = {trials_data{file_index,1}; trials_data{file_index,2}};
-        % Validate trial
-        ValidateTrial( models, single_trial_data, file_name, 1 );
-    end
+folder = main_folder;
+trials_data = GetTrialsData([folder]);
+
+% ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
+files = dir([[folder], '*.mat'])';
+% Get number of data entries.
+numFiles = size(trials_data, 1);
+for file_index=1:1:numFiles
+%     keyboard
+    % Get current trial file name
+    file_name = files(file_index).name;
+    % Get single trial's data
+    single_trial_data = {trials_data{file_index,1}; trials_data{file_index,2}};
+    % Validate trial
+    ValidateTrial( models, single_trial_data, file_name, 1 );
 end
+% % Builds all specified models
+% for i=1:length(folders)
+%     folder = [folders(i).name '\'];
+%     trials_data = GetTrialsData([main_folder folder]);
+% 
+%     % ANALYZE THE VALIDATION TRIALS ONE BY ONE, SAMPLE BY SAMPLE
+%     files = dir([[main_folder folder], '*.mat'])';
+%     % Get number of data entries.
+%     numFiles = size(trials_data, 1);
+%     for file_index=1:1:13
+%         % Get current trial file name
+%         file_name = files(file_index).name;
+%         % Get single trial's data
+%         single_trial_data = {trials_data{file_index,1}; trials_data{file_index,2}};
+%         % Validate trial
+%         ValidateTrial( models, single_trial_data, file_name, 1 );
+%     end
+% end

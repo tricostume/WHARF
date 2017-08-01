@@ -88,9 +88,9 @@ for i=1:size(model_names, 2)
         disp(hand_strings{hand_index});
         % Generate models and compute thresholds
         if hand_index==1
-            [model_gP, model_gS, model_bP, model_bS] = GenerateModel(processed_data.left, numSamples);
+            [model_gP, model_gS, model_bP, model_bS] = GenerateModel(processed_data.left, numSamples, 0);
         else
-            [model_gP, model_gS, model_bP, model_bS] = GenerateModel(processed_data.right, numSamples);
+            [model_gP, model_gS, model_bP, model_bS] = GenerateModel(processed_data.right, numSamples, 0);
         end
         model_threshold = ComputeThreshold(model_gP,model_gS,model_bP,model_bS,scale);
         hand_model = struct('gP',model_gP,'gS',model_gS,'bP',model_bP,'bS',model_bS,'threshold',model_threshold);
@@ -106,6 +106,11 @@ for i=1:size(model_names, 2)
     models(i).train_time = toc();
 end
 clear hand_strings hand_folders model_names folders
+
+times=zeros(1,5);
+for i=1:5
+    times(1,i) = models(i).train_time;
+end
 
 % SAVE THE MODELS IN THE CURRENT DIRECTORY
 save models_and_thresholds.mat
