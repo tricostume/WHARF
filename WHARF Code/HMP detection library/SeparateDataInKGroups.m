@@ -49,6 +49,5 @@ function [ k_sets, k_sets_indexes ] = SeparateDataInKGroups( processed_data, num
 
         k_sets_indexes(k,:) = initial:final;
     end
-
 end
 

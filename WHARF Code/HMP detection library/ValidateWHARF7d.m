@@ -116,6 +116,7 @@ for k=1:1:numFiles
     %disp(['---Validating trial:' num2str(k) ': ' file_name(1:end-4) ' ']);
     ValidateTrial7d( models, single_trial_data, file_name, 1 );
     close all;
+    break;
 end
 % % Builds all specified models
 % for i=1:length(folders)

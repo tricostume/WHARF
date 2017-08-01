@@ -130,22 +130,30 @@ function [  ] = ValidateTrial7d( models, trial_data, file_name, debug_mode )
            disp(['------- ' file_name(1:end-4) ' Completed: ' int2str(j) '/ ' int2str(num_samples)]);
         end
     end
-      %  end
 
-
-
-        % log the classification results in the log file
-         possibilities = hand_possibilities(:,:, 1);
-         if use_DTW == 1
-         possibilities_DTW = hand_possibilities_DTW(:,:,1);
-         end
-         final_probabilities =  hand_probabilities(:,:, 1);
-        save(resultFileName, ...
+    % log the classification results in the log file
+    possibilities = hand_possibilities(:,:, 1);
+    if use_DTW == 1
+        possibilities_DTW = hand_possibilities_DTW(:,:,1);
+    end
+    final_probabilities =  hand_probabilities(:,:, 1);
+    
+    % Get times
+    model_times = zeros(length(models),4);
+    for i=1:length(models)
+        model_temp = full_times(full_times(:, i)>0, i);
+        model_times(i, :) = [min(model_temp), max(model_temp), mean(model_temp), std(model_temp)];
+    end
+    pos_times = val_times(val_times>0);
+    disp([min(pos_times), max(pos_times), mean(pos_times), std(pos_times)]);
+    % Save the validation data
+    save(resultFileName, ...
         'possibilities', ...
         'log_dist', ...
         'final_probabilities', ...
         'val_times', ...
         'full_times', ...
+        'model_times', ...
         '-v7.3');
 
     % Plot the possibilities and probabilities curves for the models

@@ -82,13 +82,14 @@ files = dir([[folder], '*.mat'])';
 % Get number of data entries.
 numFiles = size(trials_data, 1);
 for file_index=1:1:numFiles
-%     keyboard
     % Get current trial file name
     file_name = files(file_index).name;
     % Get single trial's data
     single_trial_data = {trials_data{file_index,1}; trials_data{file_index,2}};
     % Validate trial
     ValidateTrial( models, single_trial_data, file_name, 1 );
+    close all;
+    break;
 end
 % % Builds all specified models
 % for i=1:length(folders)

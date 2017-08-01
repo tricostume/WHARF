@@ -58,7 +58,7 @@ number_k_sets = 5;
 % Models to be ran
 model_names = {'OpenCloseCurtains', 'Sweeping', 'FillingCuponTap', ...
     'RemovingFromFridge', 'WardrobeOpening'};
-folder = 'Data\PREPROCESSED_DATA\';
+folder = 'Data\PREPROCESSED_DATA\REDUCED\3\';
 unprocessed_model_folder_names = {'Open_Close_Curtains_MODEL\', 'Sweeping_MODEL\', 'Filling_Cup_on_Tap_MODEL\', ...
     'Removing_from_Fridge_MODEL\', 'Wardrobe_Opening_MODEL\'};
 unprocessed_data_folder = 'Data\MODELS\';
@@ -76,6 +76,11 @@ for i=1:size(model_names, 2)
     % EXTRACT THE ACCELEROMETER PREPREOCESSED DATA FROM THE MAT FILES
     processed_data = GetProcessedData(modelfile);
     numSamples = processed_data.size;
+    keep_of_five = 5;
+    if isfield(processed_data, 'keep')
+        keep_of_five = processed_data.keep;
+    end
+    
     %Separating the data into different sets
     [k_sets, k_sets_indexes] = SeparateDataInKGroups(processed_data, number_k_sets);
     
@@ -109,6 +114,7 @@ for i=1:size(model_names, 2)
 
         val_folder = unprocessed_model_folder_names{i};
         val_trials_data = GetTrialsData([unprocessed_data_folder val_folder]);
+        val_processed_data;
 
         for val_file_index = k_sets_indexes(validation_set_index,:)
             validation_file_name = ['K_GROUPS_' model_names{i} ...
@@ -117,6 +123,9 @@ for i=1:size(model_names, 2)
             validation_data = cell(2,1);
             single_val_trial_data = {val_trials_data{val_file_index,1}; ...
                                      val_trials_data{val_file_index,2}};
+            single_val_trial_data{1} = ReduceDataset(single_val_trial_data{1}, keep_of_five);
+            single_val_trial_data{2} = ReduceDataset(single_val_trial_data{2}, keep_of_five);
+            
             ValidateTrial( temp_model, single_val_trial_data, validation_file_name, 0 );
         end
         
