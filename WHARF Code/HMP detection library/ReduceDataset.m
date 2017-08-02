@@ -6,7 +6,7 @@ function [ downsampled_data ] = ReduceDataset(data, keep_of_five)
     
     count = 0;
     for i=1:numSamples
-        if mod(i, 5) < keep_of_five
+        if mod(i - 1, 5) < keep_of_five
             count = count + 1;
             downsampled_data(:, count) = data(:, i);
         end

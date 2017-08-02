@@ -32,7 +32,7 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
         models_size(m) = size(models(m).left_hand.bP,2)+64;
     end
     min_window_size = min(models_size);
-    window_size = max(models_size);
+    window_size = max(models_size) + 1;
     % create an array with the models thresholds
     thresholds = zeros(numHands, numModels);
     for m=1:1:numModels
@@ -43,8 +43,8 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     
     % Since two hands have same number of samples for a specific trial, get
     % number of samples from left hand.
-    trial_data{1} = [trial_data{1},zeros(4,300)];
-    trial_data{2} = [trial_data{2},zeros(4,300)];
+    trial_data{1} = [zeros(4,150),trial_data{1},zeros(4,150)];
+    trial_data{2} = [zeros(4,150),trial_data{2},zeros(4,150)];
     num_samples = size(trial_data{1}, 2);
     % If number of samples in trial is smaller than window size, ignore
     % trial
@@ -63,6 +63,8 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     
     val_times = zeros(1, num_samples);
     full_times = zeros(num_samples, numModels);
+    
+    is_run = zeros(num_samples, numHands);
     
     for hand_index=1:1:numHands
         % transform the trial into a stream of samples
@@ -88,10 +90,10 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
                     % distance, else set distance to infinite so prob is 0
                     if numWritten > models_size(m)
                         difference = size(gravity,1)-models_size(m);
-                    if difference<0
-                        gravity = [zeros(-difference,3);gravity];
-                        body = [zeros(-difference,3);body];
-                    end
+                        if difference<0
+                            gravity = [zeros(-difference,3);gravity];
+                            body = [zeros(-difference,3);body];
+                        end
                         [hand_dist(hand_index, m), temp_probabilities(m)] = ...
                                     CompareWithModels( ...
                                         gravity(end-models_size(m)+1:end-64,:), ...
@@ -112,12 +114,14 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
                     full_times(j, m) = full_times(j, m) + toc(time_in);
                 end
                 % Classify the current data
+                is_run(j, hand_index) = 1;
                 hand_possibilities(j,:, hand_index) = Classify(hand_dist(hand_index, :),thresholds(hand_index, :));
 %                 hand_possibilities_DTW(j,:, hand_index) = Classify(hand_dist_DTW(hand_index, :),thresholds(hand_index, :));
                 hand_probabilities(j,:, hand_index) = temp_probabilities;
                 
                 val_times(j) = val_times(j) + toc(time_out);
             else
+                is_run(j, hand_index) = 0;
                 hand_possibilities(j,:, hand_index) = zeros(1,numModels);
 %                 hand_possibilities_DTW(j,:, hand_index) = zeros(1,numModels);
                 hand_probabilities(j,:, hand_index) = zeros(1,numModels);
@@ -133,7 +137,8 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     possibilities = hand_possibilities(:,:, 1) .* hand_possibilities(:,:, 2);
 %     possibilities_DTW = hand_possibilities_DTW(:,:, 1) .* hand_possibilities_DTW(:,:, 2);
     probabilities = hand_probabilities(:,:, 1) .* hand_probabilities(:,:, 2);
-    
+
+%     disp([sum(possibilities), sum(probabilities(probabilities<100))])
     % Get times
     model_times = zeros(length(models),4);
     for i=1:length(models)

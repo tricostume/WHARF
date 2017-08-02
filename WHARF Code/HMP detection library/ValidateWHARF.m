@@ -68,6 +68,7 @@ models(6).name='Dummy';
 
 % DEFINE THE VALIDATION FOLDER TO BE USED AND GET DATA FROM IT
 main_folder = 'Data\K-GROUPS\VALIDATION\SET_6\';
+main_folder = 'Data\VALIDATION\Razeen_VALIDATION\';
 % Get list of folders with data to be validated
 folders = dir(main_folder);
 folders = folders(~ismember({folders.name},{'.','..'}));

@@ -63,6 +63,7 @@ models(6).name='Dummy';
 
 % DEFINE THE VALIDATION FOLDER TO BE USED AND GET DATA FROM IT
 main_folder = 'Data\K-GROUPS\VALIDATION\SET_6\';
+main_folder = 'Data\VALIDATION\Razeen_VALIDATION\';
 % Builds all specified models
 folder = main_folder;
 disp(['Validating folder : ' folder]);

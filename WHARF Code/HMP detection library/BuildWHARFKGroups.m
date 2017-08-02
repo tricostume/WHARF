@@ -114,7 +114,6 @@ for i=1:size(model_names, 2)
 
         val_folder = unprocessed_model_folder_names{i};
         val_trials_data = GetTrialsData([unprocessed_data_folder val_folder]);
-        val_processed_data;
 
         for val_file_index = k_sets_indexes(validation_set_index,:)
             validation_file_name = ['K_GROUPS_' model_names{i} ...
