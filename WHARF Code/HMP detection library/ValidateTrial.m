@@ -8,7 +8,7 @@ function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
     end
     
     % Define constants
-    res_folder = 'Data\K-GROUPS\RESULTS\4X4_SET_6\';
+    res_folder = 'Data\K-GROUPS\RESULTS\REDUCED\3\';
     model_hands = {'left_hand', 'right_hand'};
     
     % Set result file names
@@ -184,7 +184,8 @@ function [] = PlotAndPrint(graph_file_name, models, plotted_values, min_window_s
     plot(x, plotted_values(min_window_size:end,:));
     title(graph_file_name)
     % title()
-    h = legend(models(:).name, numModels);
+    %legnd = models(:).name ;
+    h = legend(models(:).name);
     set(h,'Interpreter','none');
     print(fig, graph_file_name, '-deps');
     print(fig, graph_file_name, '-dpng');

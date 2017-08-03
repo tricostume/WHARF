@@ -81,9 +81,16 @@ g(:,2) = filter(Hd,y_axis);
 g(:,3) = filter(Hd,z_axis);
 
 % COMPUTE THE BODY-ACCELERATION COMPONENTS BY SUBTRACTION
-gravity = zeros(numSamples-delay,3);
-body = zeros(numSamples-delay,3);
-for i=1:1:(numSamples-delay)
+% To accommodate lower resolutions of modelling, that is lesser numSamples
+% than 64; numSamples-delay is changed to temp;
+if numSamples-delay >= 0
+    temp = numSamples-delay;
+else
+   temp = numSamples;
+end
+gravity = zeros(temp,3);
+body = zeros(temp,3);
+for i=1:1:(temp)
     % shift & reshape gravity to reduce the delaying effect of filtering
     gravity(i,1) = g(i+delay,1);
     gravity(i,2) = g(i+delay,2);
@@ -96,34 +103,34 @@ end
 
 % DEBUG: PLOT RAW DATA, GRAVITY AND BODY ACC. COMPONENTS
 if (debugMode == 1)
-    time = 1:1:(numSamples-delay);
+    time = 1:1:(temp);
     figure,
         subplot(3,1,1);
-        plot(time,x_axis(1:numSamples-delay),'-r');
+        plot(time,x_axis(1:temp),'-r');
         hold on;
-        plot(time,gravity(1:numSamples-delay,1),'-g');
+        plot(time,gravity(1:temp,1),'-g');
         hold on;
-        plot(time,body(1:numSamples-delay,1),'-b');    
-        axis([0 numSamples-delay -14.709 +14.709]);
+        plot(time,body(1:temp,1),'-b');    
+        axis([0 temp -14.709 +14.709]);
         legend('raw acceleration','gravity','body acc.');
         title('Raw acceleration, gravity & body acc. components along the x axis');
         subplot(3,1,2);
-        plot(time,y_axis(1:numSamples-delay),'-r');
+        plot(time,y_axis(1:temp),'-r');
         hold on;
-        plot(time,gravity(1:numSamples-delay,2),'-g');
+        plot(time,gravity(1:temp,2),'-g');
         hold on;
-        plot(time,body(1:numSamples-delay,2),'-b');    
-        axis([0 numSamples-delay -14.709 +14.709]);
+        plot(time,body(1:temp,2),'-b');    
+        axis([0 temp -14.709 +14.709]);
         legend('raw acceleration','gravity','body acc.');
         title('Raw acceleration, gravity & body acc. components along the y axis');
         ylabel('acceleration [m/s^2] ');
         subplot(3,1,3);
-        plot(time,z_axis(1:numSamples-delay),'-r');
+        plot(time,z_axis(1:temp),'-r');
         hold on;
-        plot(time,gravity(1:numSamples-delay,3),'-g');
+        plot(time,gravity(1:temp,3),'-g');
         hold on;
-        plot(time,body(1:numSamples-delay,3),'-b');    
-        axis([0 numSamples-delay -14.709 +14.709]);
+        plot(time,body(1:temp,3),'-b');    
+        axis([0 temp -14.709 +14.709]);
         legend('raw acceleration','gravity','body acc.');
         title('Raw acceleration, gravity & body acc. components along the z axis');
         xlabel('time [samples]');
