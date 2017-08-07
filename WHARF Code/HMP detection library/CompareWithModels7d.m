@@ -83,6 +83,7 @@ for i=1:1:numPoints
            bigger_b_sigma = MODELbS(:,:,find(time==x)) + 30E-2.*diag(ones(6,1));
            try
                 probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
+				%sizes gravity(:,x)'[1x3] zeros         MODELgP(2:end,find(time==x))'[1x3]      bigger_g_sigma[3x3]
                 probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
            catch
                 keyboard
