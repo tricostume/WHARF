@@ -1,7 +1,6 @@
 function [  ] = ValidateTrial( models, trial_data, file_name, debug_mode )
 %VALIDATETRIAL Summary of this function goes here
 %   Detailed explanation goes here
-
     % Define default value for flag debugMode as false
     if nargin < 4 || isempty(debug_mode)
         debug_mode = 0;

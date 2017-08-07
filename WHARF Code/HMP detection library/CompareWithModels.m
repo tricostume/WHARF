@@ -47,7 +47,9 @@ function [ovDistance, probabilities] = CompareWithModels(gravity,body,MODELgP,MO
 % COMPUTE MAHALANOBIS DISTANCE BETWEEN MODEL FEATURES AND WINDOW FEATURES
 numPoints = size(MODELgS,3);
 gravity = gravity';
+gravity_ = gravity;
 body = body';
+body_ = body;
 time = MODELgP(1,:);
 distance = zeros(numPoints,2);
 
@@ -61,28 +63,63 @@ for i=1:1:numPoints
     
     % Compute punctual probabilities
     try
-        probabilities_gravity(i) = mvnpdf(gravity(:,x)',MODELgP(2:end,find(time==x))',MODELgS(:,:,find(time==x)));
-        probabilities_body(i) = mvnpdf(body(:,x)',MODELbP(2:end,find(time==x))',MODELbS(:,:,find(time==x)));
+        %------------------------------------------------------------------
+        % WORKING WITH CDF
+% % %         tempGrav = (gravity(:,x)' <= MODELgP(2:end,find(time==x))');
+% % %         tempBod = (body(:,x)' <= MODELbP(2:end,find(time==x))');
+% % %         if sum(tempGrav) ~= 3
+% % %             temp2Grav = find(~tempGrav);
+% % %             gravity_(temp2Grav,x) = MODELgP(temp2Grav+1,find(time==x)) - (gravity(temp2Grav,x)-MODELgP(temp2Grav+1,find(time==x)));
+% % %         end
+% % %         if sum(tempBod) ~= 3
+% % %             temp2Bod = find(~tempBod);
+% % %             body_(temp2Bod,x) = MODELbP(temp2Bod+1,find(time==x)) - (body(temp2Bod,x)-MODELbP(temp2Bod+1,find(time==x)));
+% % %         end
+% % %         tempGrav = (gravity_(:,x)' <= MODELgP(2:end,find(time==x))');
+% % %         tempBod = (body_(:,x)' <= MODELbP(2:end,find(time==x))');
+% % %         muG = MODELgP(2:end,find(time==x))';
+% % %         muB = MODELbP(2:end,find(time==x))';
+% % %         sigmaG = MODELgS(:,:,find(time==x));
+% % %         sigmaB = MODELbS(:,:,find(time==x));
+% % %         sigmaG = (sigmaG + sigmaG')/2;
+% % %         sigmaB = (sigmaB + sigmaB')/2;
+% % %         if sum(tempGrav) == 3 && sum(tempBod) == 3
+% % %             probabilities_gravity(i) = 2*mvncdf(gravity_(:,x)',muG,sigmaG);
+% % %             probabilities_body(i) = 2*mvncdf(body_(:,x)',muB,sigmaB);
+% % %         else
+% % %         end
+        %------------------------------------------------------------------
+        % WORKING WITH PDF
+        muG = MODELgP(2:end,find(time==x))';
+        sigmaG = MODELgS(:,:,find(time==x));
+        sigmaG = (sigmaG + sigmaG')/2;
+        probabilities_gravity(i) = mvnpdf(gravity_(:,x)',muG,sigmaG);
+        muB = MODELbP(2:end,find(time==x))';
+        sigmaB = MODELbS(:,:,find(time==x));
+        sigmaB = (sigmaB + sigmaB')/2;
+        probabilities_body(i) = mvnpdf(body_(:,x)',muB,sigmaB); 
+        %------------------------------------------------------------------
     catch
         % Try to eliminate numerical problems by adding a really small
         % value to sigma
-        bigger_g_sigma = MODELgS(:,:,find(time==x)) + 5E-3.*diag(ones(3,1));
-        bigger_b_sigma = MODELbS(:,:,find(time==x)) + 5E-3.*diag(ones(3,1));
-        try
-            probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
-            probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
-        catch
-            % Try to eliminate numerical problems by adding a really small
-            % value to sigma
-            bigger_g_sigma = MODELgS(:,:,find(time==x)) + 2E-2.*diag(ones(3,1));
-            bigger_b_sigma = MODELbS(:,:,find(time==x)) + 2E-2.*diag(ones(3,1));
-            try
-                probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
-                probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
-            catch
-                keyboard
-            end
-        end
+        keyboard
+%         bigger_g_sigma = MODELgS(:,:,find(time==x)) + 5E-5.*diag(ones(3,1));
+%         bigger_b_sigma = MODELbS(:,:,find(time==x)) + 5E-5.*diag(ones(3,1));
+%         try
+%             probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
+%             probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
+%         catch
+%             % Try to eliminate numerical problems by adding a really small
+%             % value to sigma
+%             bigger_g_sigma = MODELgS(:,:,find(time==x)) + 2E-2.*diag(ones(3,1));
+%             bigger_b_sigma = MODELbS(:,:,find(time==x)) + 2E-2.*diag(ones(3,1));
+% %             try
+% %                 probabilities_gravity(i) = mvnpdf(gravity(:,x)', MODELgP(2:end,find(time==x))', bigger_g_sigma);
+% %                 probabilities_body(i) = mvnpdf(body(:,x)', MODELbP(2:end,find(time==x))', bigger_b_sigma);
+% %             catch
+% %                 keyboard
+% %             end
+%         end
     end
 end
 
