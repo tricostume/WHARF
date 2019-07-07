@@ -1,6 +1,6 @@
 WHARF - Wearable Human Activity Recognition Folder
 --------------------------------------------------
-![alt text](curtains.pdf)
+![alt text](curtains.png)
 
 1. What is it?
 --------------
@@ -54,4 +54,4 @@ This code is written in Matlab and it remains the only requisite to be able to r
 
 ## Results
 Five actions could be classified with an overal accuracy of 82% as concluded by a K-fold cross validation analysis as seen in this confusion matrix and further explained in our paper.
-![alt text](confusion_4D_prob_crop.eps)
+![alt text](confusion_4D_prob_crop.png)
