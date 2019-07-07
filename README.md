@@ -1,6 +1,6 @@
 WHARF - Wearable Human Activity Recognition Folder
 --------------------------------------------------
-
+![alt text](curtains.pdf)
 
 1. What is it?
 --------------
@@ -45,10 +45,13 @@ the whole picture of this work, three out of five activities could be recognised
 trials.
 
 ## Code
-The code is separated in two folders: WHARF Code and WHARF Data Set. The first one contains all functions necessary for training and inference and their appropriate functioning depend on the existence of the data set in the second folder.
+The code is separated in two folders: WHARF Code and WHARF Data Set. The first one contains all functions necessary for training and inference and their appropriate functioning depend on the existence of the data set in the second folder. As an example from the activity Open/Close curtains, the model extracted from the activity "Open/Close Curtains (OCC)" can be seen here:
+![alt text](GRAPH_OpenCloseCurtains_2x7_1.png)
+
 
 ## Installation
 This code is written in Matlab and it remains the only requisite to be able to run properly.
 
 ## Results
-Five actions could be classified with an overal accuracy of 82% as concluded by a K-fold cross validation analysis. 
+Five actions could be classified with an overal accuracy of 82% as concluded by a K-fold cross validation analysis as seen in this confusion matrix and further explained in our paper.
+![alt text](confusion_4D_prob_crop.eps)
